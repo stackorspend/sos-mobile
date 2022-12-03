@@ -3,7 +3,7 @@ export default {
   primaryGreen: "#6F977F",
   positive: "#E9FBF0",
   cautious: "#FFD98F",
-  copy: "#252F29",
+  copy: "#291A1A",
   secondary: "#22252D",
   disabled: "#B1B1B1",
   tabDefault: "#888888",

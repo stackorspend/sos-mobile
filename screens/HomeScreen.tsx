@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Pressable, ScrollView } from "react-native"
+import { StyleSheet, View, Text, Pressable, ScrollView, Button } from "react-native"
 import styled from "styled-components/native"
 import { useNavigation } from "@react-navigation/native"
 import { HomeScreenNavigationProp } from "../navigation/types"
@@ -38,7 +38,7 @@ const HomeScreen = () => {
       </ScrollView>
       <BottomActions>
         <MainButton clickHandler={() => navigation.push("Send")} title="💸 Send Sats" />
-        {/* <Button title="Camera" onPress={() => navigation.navigate("Details")} /> */}
+        <Button title="Camera" onPress={() => navigation.push("TransferComplete")} />
         <MainButton title="Receive" />
       </BottomActions>
     </Container>

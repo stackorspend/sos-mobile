@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import HomeScreen from "../screens/HomeScreen"
 import { HomeStackNavigatorParamList } from "./types"
 import SendScreen from "../screens/SendScreen"
+import TransferCompleteScreen from "../screens/TransferComplete"
 
 const HomeStack = createNativeStackNavigator<HomeStackNavigatorParamList>()
 
@@ -16,6 +17,7 @@ const HomeStackNavigator = () => {
     >
       <HomeStack.Screen name="Home" component={HomeScreen} />
       <HomeStack.Screen name="Send" component={SendScreen} />
+      <HomeStack.Screen name="TransferComplete" component={TransferCompleteScreen} />
     </HomeStack.Navigator>
   )
 }
