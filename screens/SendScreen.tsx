@@ -20,7 +20,6 @@ import {
 } from "../styles/typography"
 import MainButton from "../styles/buttons/main-button"
 import { useState } from "react"
-import Tags from "react-native-tags"
 
 const TAGS = ["Dining", "Health", "Groceries", "Dining"]
 
@@ -73,30 +72,7 @@ export default function SendScreen() {
           <TextRegular color={colors.primaryGreen}>US$2,000</TextRegular>
           <Button title="Add note" />
           <Button title="Add tags" />
-          <View style={{ height: 60 }}>
-            <Tags
-              initialText="monkey"
-              textInputProps={{
-                placeholder: "Any type of animal",
-              }}
-              initialTags={["dog", "cat", "chicken"]}
-              onChangeTags={(tags) => console.log(tags)}
-              onTagPress={(index, tagLabel, event, deleted) =>
-                console.log(index, tagLabel, event, deleted ? "deleted" : "not deleted")
-              }
-              containerStyle={{
-                justifyContent: "center",
-                width: "100%",
-                background: "red",
-              }}
-              inputStyle={{ backgroundColor: "white" }}
-              renderTag={({ tag, index, onPress, deleteTagOnPress, readonly }) => (
-                <TouchableOpacity key={`${tag}-${index}`} onPress={onPress}>
-                  <Text>{tag}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
+
           <View style={{ height: 40 }}>
             <ScrollView horizontal>
               {TAGS.map((item, index) => (
