@@ -7,5 +7,9 @@
       "channel": "staging",
       "distribution": "internal"
     }
+  },
+  "cli": {
+    "version": ">= 0.43.0",
+    "requireCommit": true
   }
 }
