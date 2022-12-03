@@ -16,7 +16,18 @@ const HomeStackNavigator = () => {
       }}
     >
       <HomeStack.Screen name="Home" component={HomeScreen} />
-      <HomeStack.Screen name="Send" component={SendScreen} />
+      <HomeStack.Screen
+        name="Send"
+        component={SendScreen}
+        options={{
+          headerShown: true,
+          // headerBackTitleVisible: false,
+          headerTitle: "",
+          headerShadowVisible: false,
+          headerTransparent: true,
+          headerTintColor: "black",
+        }}
+      />
       <HomeStack.Screen name="TransferComplete" component={TransferCompleteScreen} />
     </HomeStack.Navigator>
   )

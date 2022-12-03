@@ -5,6 +5,12 @@ import { HomeScreenNavigationProp } from "../navigation/types"
 import colors from "../styles/colors"
 import { TextBold, TextLight, TextRegular } from "../styles/typography"
 import MainButton from "../styles/buttons/main-button"
+import { useState } from "react"
+import { FontAwesome } from "@expo/vector-icons"
+import IconButton from "../styles/buttons/icon-button"
+import { PRICE_STATES } from "../project-constants"
+import { ContainerWithColourIntent } from "../components/reusables"
+import useColors from "../components/custom-hooks/useColors"
 
 const TAGGED = [
   {
@@ -15,33 +21,83 @@ const TAGGED = [
   { tag: "Health", percentage: 35, delta: 3 },
   { tag: "Groceries", percentage: 35, delta: 3 },
 ]
-const STATES = {
-  STACK: "stack",
-  SPEND: "spend",
-}
+
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>()
 
+  // State
+  const [currentState, setCurrentState] = useState(PRICE_STATES.SPEND)
+
+  // Custom hooks
+  const { isSpend, textColor, backgroundColor } = useColors(currentState)
+
   return (
-    <Container style={{ flex: 1, paddingTop: 70, paddingHorizontal: 12 }}>
-      <TextLight size={58}>You currently have</TextLight>
+    <ContainerWithColourIntent
+      color={backgroundColor}
+      style={{ flex: 1, paddingTop: 70, paddingHorizontal: 12 }}
+    >
+      <TextLight color={textColor} size={58}>
+        You currently have
+      </TextLight>
       <TextRegular mBottom={40} size={48}>
         620 000 sats
       </TextRegular>
-      <TextRegular size={48}>2%</TextRegular>
-      <TextRegular mBottom={40}>will be saved on your next spend</TextRegular>
-      <TextRegular>Your spending</TextRegular>
-      <ScrollView horizontal>
-        {TAGGED.map((item, index) => (
-          <TaggedSpendingItem key={index} {...item} />
-        ))}
-      </ScrollView>
+      <TextRegular color={textColor} size={48}>
+        2%
+      </TextRegular>
+      <TextRegular color={textColor} mBottom={40}>
+        will be saved on your next {isSpend ? "spend" : "stack"}
+      </TextRegular>
+      <Button
+        onPress={() => {
+          isSpend
+            ? setCurrentState(PRICE_STATES.STACK)
+            : setCurrentState(PRICE_STATES.SPEND)
+        }}
+        title={isSpend ? "Stack" : "Spend"}
+      />
+      <TextRegular color={textColor} mBottom={12}>
+        Your spending
+      </TextRegular>
+      {/* <View
+        style={{
+          backgroundColor: isSpend ? "#C5DECF" : "#FFE8BC",
+          height: 110,
+          borderRadius: 8,
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: 8,
+        }}
+      >
+        <TextRegular style={{ textAlign: "center" }} color={textColor}>
+          Tag transactions to track your spending{" "}
+        </TextRegular>
+      </View> */}
+      <View style={{ height: 130 }}>
+        <ScrollView horizontal>
+          {TAGGED.map((item, index) => (
+            <TaggedSpendingItem key={index} {...item} />
+          ))}
+        </ScrollView>
+      </View>
       <BottomActions>
-        <MainButton clickHandler={() => navigation.push("Send")} title="💸 Send Sats" />
-        <Button title="Camera" onPress={() => navigation.push("TransferComplete")} />
-        <MainButton title="Receive" />
+        <MainButton
+          style={{ flex: 1 }}
+          clickHandler={() => navigation.push("Send")}
+          title="💸 Send Sats"
+        />
+        <IconButton
+          clickHandler={() => alert("TODO: Open Camera")}
+          icon={<FontAwesome name="camera" size={16} color="white" />}
+          btnStyle={{ marginHorizontal: 13 }}
+        />
+        <MainButton
+          clickHandler={() => alert("TODO: Receive flow")}
+          style={{ flex: 1 }}
+          title="Receive"
+        />
       </BottomActions>
-    </Container>
+    </ContainerWithColourIntent>
   )
 }
 
@@ -54,7 +110,7 @@ type TaggedSpendingProps = {
 }
 
 const TaggedSpendingContainer = styled.View`
-  background-color: ${colors.primaryGreen};
+  background-color: rgba(0, 0, 0, 0.5);
   justify-content: space-between;
   width: 140px;
   height: 120px;
@@ -67,21 +123,22 @@ const TaggedSpendingItem = ({ tag, percentage, delta }: TaggedSpendingProps) => 
   return (
     <TaggedSpendingContainer>
       <TextRegular color="white">{tag}</TextRegular>
-      <TextBold color="white">{percentage}%</TextBold>
-      <TextRegular color="white">+{delta}% this month</TextRegular>
+      <TextBold size={24} color="white">
+        {percentage}%
+      </TextBold>
+      <TextRegular size={12} color="white">
+        +{delta}% this month
+      </TextRegular>
     </TaggedSpendingContainer>
   )
 }
-
-const Container = styled.View`
-  background: ${colors.positive};
-`
 const BottomActions = styled.View`
   position: absolute;
   bottom: 30px;
+  left: 12px;
+  right: 12px;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   width: 100%;
-  background: ${colors.positive};
 `

@@ -19,24 +19,24 @@ const Button = styled.View`
       : props.danger
       ? "red"
       : colors.dark};
-  border: ${(props) =>
-    props.secondary ? `1px solid ${colors.copy}` : `1px solid transparent`};
-  min-width: ${(props) => (props.small ? "100px" : "100%")};
+  border: ${(props) => (props.secondary ? `1px solid white` : `1px solid transparent`)};
+  width: 35px;
+  height: 35px;
   /* min-width: 140px; */
-  border-radius: 8px;
-  height: ${(props) => (props.small ? "37px" : "49px")};
+  border-radius: 17px;
+
   align-items: center;
   justify-content: center;
 `
 const Text = styled.Text`
-  color: ${(props) => (props.secondary ? colors.copy : "white")};
+  color: ${(props) => (props.primary || props.white ? colors.copy : "white")};
   /* color: white; */
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   padding: 0 18px;
 `
 
-const MainButton = ({
+const IconButton = ({
   clickHandler,
   disabled,
   icon,
@@ -45,7 +45,6 @@ const MainButton = ({
   secondary,
   small,
   style,
-  title,
   white,
   btnStyle,
 }) => (
@@ -65,18 +64,10 @@ const MainButton = ({
       primary={primary}
       style={{ ...btnStyle }}
     >
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        {icon && <View style={{ left: 12 }}>{icon}</View>}
-        {loading ? (
-          <ActivityIndicator color={"white"} />
-        ) : (
-          <Text secondary={secondary} disabled={disabled}>
-            {title}
-          </Text>
-        )}
-      </View>
+      {icon && <View>{icon}</View>}
+      {loading ? <ActivityIndicator color={"white"} /> : []}
     </Button>
   </TouchableOpacity>
 )
 
-export default MainButton
+export default IconButton
