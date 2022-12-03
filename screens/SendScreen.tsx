@@ -70,9 +70,9 @@ export default function SendScreen() {
           placeholderTextColor={textColor}
           onChangeText={(text) => setSatsAmount(text)}
           defaultValue={satsToSend}
-          returnKeyType="next"
-          blurOnSubmit={false}
-          keyboardType="default"
+          returnKeyType="done"
+          blurOnSubmit={true}
+          keyboardType="numeric"
         />
       )}
       {currentScreenState === STATES.INVOICE && (
