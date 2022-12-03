@@ -1,0 +1,18 @@
+{
+  "build": {
+    "production": {
+      "channel": "master"
+    },
+    "preview": {
+      "channel": "staging",
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    }
+  },
+  "cli": {
+    "version": ">= 0.43.0",
+    "requireCommit": true
+  }
+}

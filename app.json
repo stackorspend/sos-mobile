@@ -2,6 +2,7 @@
   "expo": {
     "name": "sos-mobile",
     "slug": "sos-mobile",
+    "runtimeVersion": "1.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,19 +13,20 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 30000,
+      "url": "https://u.expo.dev/45ca335e-d5fe-4ecc-8968-d8167c1063e0"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.stackorspend.sosmobile"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.stackorspend.sosmobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
