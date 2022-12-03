@@ -43,8 +43,10 @@ export default function SendScreen() {
       <Button title="Add note" />
       <Button title="Add tags" />
       <TransferContainer>
-        <View style={{ flex: 3 }}>
-          <TextRegular>Transfer?</TextRegular>
+        <View style={{ flex: 4 }}>
+          <TextRegular mBottom={8} color={colors.primaryGreen} size={18}>
+            Transfer?
+          </TextRegular>
           <TextRegular>
             This toggle allows you to transfer your sats to another wallet, without
             affecting your average buying price{" "}
@@ -52,7 +54,7 @@ export default function SendScreen() {
         </View>
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <Switch
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
+            trackColor={{ false: "#767577", true: colors.primaryGreen }}
             //   thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
             ios_backgroundColor="#3e3e3e"
             onValueChange={toggleSwitch}
