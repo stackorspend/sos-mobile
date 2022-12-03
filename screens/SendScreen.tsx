@@ -6,6 +6,7 @@ import {
   Button,
   Switch,
   ScrollView,
+  TouchableOpacity,
 } from "react-native"
 import styled from "styled-components/native"
 import { useNavigation } from "@react-navigation/native"
@@ -19,6 +20,7 @@ import {
 } from "../styles/typography"
 import MainButton from "../styles/buttons/main-button"
 import { useState } from "react"
+import Tags from "react-native-tags"
 
 const TAGS = ["Dining", "Health", "Groceries", "Dining"]
 
@@ -61,17 +63,47 @@ export default function SendScreen() {
               small
             />
           </Actions>
-          <TextRegular>$US325.00</TextRegular>
-          <TextBold>Balance after:</TextBold>
-          <TextRegular>18923451 sats </TextRegular>
-          <TextRegular>US$2,000</TextRegular>
+          <TextRegular mBottom={10} size={24} color={colors.primaryGreen}>
+            $US325.00
+          </TextRegular>
+          <TextBold mBottom={4} color={colors.primaryGreen}>
+            Balance after:
+          </TextBold>
+          <TextRegular color={colors.primaryGreen}>18923451 sats </TextRegular>
+          <TextRegular color={colors.primaryGreen}>US$2,000</TextRegular>
           <Button title="Add note" />
           <Button title="Add tags" />
-          <ScrollView style={{ flex: 1, height: 30, backgroundColor: "red" }} horizontal>
-            {TAGS.map((item, index) => (
-              <TaggedSpendingItem key={index} label={item} />
-            ))}
-          </ScrollView>
+          <View style={{ height: 60 }}>
+            <Tags
+              initialText="monkey"
+              textInputProps={{
+                placeholder: "Any type of animal",
+              }}
+              initialTags={["dog", "cat", "chicken"]}
+              onChangeTags={(tags) => console.log(tags)}
+              onTagPress={(index, tagLabel, event, deleted) =>
+                console.log(index, tagLabel, event, deleted ? "deleted" : "not deleted")
+              }
+              containerStyle={{
+                justifyContent: "center",
+                width: "100%",
+                background: "red",
+              }}
+              inputStyle={{ backgroundColor: "white" }}
+              renderTag={({ tag, index, onPress, deleteTagOnPress, readonly }) => (
+                <TouchableOpacity key={`${tag}-${index}`} onPress={onPress}>
+                  <Text>{tag}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+          <View style={{ height: 40 }}>
+            <ScrollView horizontal>
+              {TAGS.map((item, index) => (
+                <TaggedSpendingItem key={index} label={item} />
+              ))}
+            </ScrollView>
+          </View>
           <TransferContainer>
             <View style={{ flex: 4 }}>
               <TextRegular mBottom={8} color={colors.primaryGreen} size={18}>
@@ -158,6 +190,7 @@ const Actions = styled.View`
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  margin-bottom: 20px;
 `
 const Input = styled.TextInput`
   border-bottom-color: #dddddd;
