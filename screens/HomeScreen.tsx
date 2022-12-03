@@ -5,6 +5,8 @@ import { HomeScreenNavigationProp } from "../navigation/types"
 import colors from "../styles/colors"
 import { TextBold, TextLight, TextRegular } from "../styles/typography"
 import MainButton from "../styles/buttons/main-button"
+import { select, getDb } from "../sos/services/sqlite/get-db"
+import { useEffect } from "react"
 
 const TAGGED = [
   {
@@ -21,6 +23,11 @@ const STATES = {
 }
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>()
+
+  useEffect(() => {
+    const rows = async () => select().then((resp: any) => console.log(resp))
+    console.log(rows)
+  }, [])
 
   return (
     <Container style={{ flex: 1, paddingTop: 70, paddingHorizontal: 12 }}>
