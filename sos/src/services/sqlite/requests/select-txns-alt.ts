@@ -1,11 +1,12 @@
 const AGG_SATS_FRAG = `SUM(sats_amount_with_fee) OVER(ORDER BY timestamp)`
-const PRICE_PER_BTC_FRAG = `fiat_per_sat / POWER(10, fiat_per_sat_offset - 8)`
-const PRICE_FRAG = `fiat_per_sat / POWER(10, fiat_per_sat_offset)`
+const PRICE_PER_BTC_FRAG = `fiat_per_sat / 10000.0` // FIXME: POWER
+const PRICE_FRAG = `fiat_per_sat / 1000000000000.0` // FIXME: POWER
 const FIAT_TOTAL_FRAG = `sats_amount_with_fee * ${PRICE_FRAG}`
 const AGG_FIAT_WITH_PL_FRAG = `SUM(${FIAT_TOTAL_FRAG}) OVER(ORDER BY timestamp)`
 
 const DISPLAY_AMOUNT = `printf("%.2f", fiat_amount_with_fee) AS amount`
 
+// FIXME: POWER
 export const BASE_TXNS_ASC_SELECT = `
   SELECT
     source_name,
@@ -23,7 +24,7 @@ export const BASE_TXNS_ASC_SELECT = `
     ${FIAT_TOTAL_FRAG} as fiat_with_pl,
     ${AGG_FIAT_WITH_PL_FRAG} as agg_fiat_with_pl,
     CASE
-      WHEN NOT sats_amount_with_fee = 0 THEN ${AGG_FIAT_WITH_PL_FRAG} / ${AGG_SATS_FRAG} * POWER(10,8)
+      WHEN NOT sats_amount_with_fee = 0 THEN ${AGG_FIAT_WITH_PL_FRAG} / ${AGG_SATS_FRAG} * 100000000.0
       ELSE null
     END as avg_price_with_pl,
     '' as __
