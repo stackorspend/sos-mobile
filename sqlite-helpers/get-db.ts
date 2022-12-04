@@ -4,30 +4,26 @@ import { SQLResultSetRowList } from "expo-sqlite"
 export const SQLiteDb = () => {
   const db = SQLite.openDatabase("sos_arvinda.db")
 
-  const create = async ({ createQuery }: { createQuery: string }): Promise<void> => {
+  const create = async (createQuery: string): Promise<void> => {
     return new Promise((resolve, reject) => {
       db.transaction(
         (tx) => {
           tx.executeSql(createQuery, [])
-          // tx.executeSql(insertQuery, row)
           resolve()
         },
-        (err) => reject(err),
+        (err) => {
+          console.log("HERE 20:", err)
+          reject(err)
+        },
       )
     })
   }
 
-  const insert = async ({
-    insertQuery,
-    row,
-  }: {
-    insertQuery: string
-    row: any[]
-  }): Promise<void> => {
+  const insert = async ({ query, row }: { query: string; row: any[] }): Promise<void> => {
     return new Promise((resolve, reject) => {
       db.transaction(
         (tx) => {
-          tx.executeSql(insertQuery, row)
+          tx.executeSql(query, row)
           resolve()
         },
         (err) => {
@@ -39,14 +35,16 @@ export const SQLiteDb = () => {
   }
 
   const select = async ({
-    selectQuery,
+    query,
+    args = [],
   }: {
-    selectQuery: string
+    query: string
+    args?: any[]
   }): Promise<SQLResultSetRowList["_array"]> => {
     return new Promise((resolve, reject) => {
       db.transaction(
         (tx) => {
-          tx.executeSql(selectQuery, [], (_, { rows }) => {
+          tx.executeSql(query, args, (_, { rows }) => {
             resolve(rows._array)
           })
         },
