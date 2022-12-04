@@ -6,7 +6,9 @@ export type HomeStackNavigatorParamList = {
   Home: undefined
   Send: undefined
   Receive: undefined
-  Transactions: undefined
+  Transactions: {
+    transactions: ApiTxn[]
+  }
   TransferComplete: {
     sats: number
     type: "send" | "receive"
@@ -31,4 +33,5 @@ export type TransferCompleteRouteProp = RouteProp<
   HomeStackNavigatorParamList,
   "TransferComplete"
 >
+export type TransactionsRouteProp = RouteProp<HomeStackNavigatorParamList, "Transactions">
 // To use in screen, const route = useRoute<DetailsScreenRouteProp>();

@@ -12,6 +12,8 @@ import { PRICE_STATES } from "../project-constants"
 import { ContainerWithColourIntent } from "../components/reusables"
 import useColors from "../components/custom-hooks/useColors"
 import { demoSoS } from "../lib/sos-demo"
+import { StackorSpend } from "../sos"
+import { SQLiteDb } from "../lib/get-db"
 const TAGGED = [
   {
     tag: "Dining",
@@ -22,14 +24,76 @@ const TAGGED = [
   { tag: "Groceries", percentage: 35, delta: 3 },
 ]
 
+// TODO:
+// - Number formatting
+// - Stack price
+// - tappable toggle for price
+// - transactions list clean up
+// - toggle for bitcoin's current price
+// - add a way to accept a unique token
+
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>()
 
   // State
-  const [currentState, setCurrentState] = useState(PRICE_STATES.SPEND)
+  const [currentStateX, setCurrentState] = useState(PRICE_STATES.SPEND)
+  const [sosDB, setSoSDB] = useState(null)
+  const [sos, setSoS] = useState<StackorSpend>(null)
+  const [currentStackPrice, setCurrentStackPrice] = useState<number | null>(0)
+  const [currentBTCPrice, setCurrentBTCPrice] = useState<number | null>(0)
+  const [currentBalances, setCurrentBalances] = useState<{
+    sats: number
+    fiat: number
+  } | null>(null)
+  const [transactions, setTransactions] = useState<any[]>([])
+
+  // Effects
+  useEffect(() => {
+    const db = SQLiteDb()
+
+    const sos = StackorSpend({
+      galoy: {
+        endpoint: "https://api.staging.galoy.io/graphql/",
+        token: "nWL9JckgHA6uMjwuz6kkYrAowrpNXSas",
+      },
+    })
+    setSoS(sos)
+    setSoSDB(db)
+
+    sos.getStackCost(db).then((cost) => {
+      setCurrentStackPrice(cost)
+    })
+
+    // TODO: implement as sos.getCurrentPrice
+    const getCurrentPrice = async () => 14_000
+    getCurrentPrice(db).then((price) => {
+      setCurrentBTCPrice(price)
+    })
+
+    // TODO: implement as sos.getCurrentPrice
+    const getBalances = async () => {
+      return { sats: 100_000, fiat: 12.34 }
+    }
+    getBalances(db).then((balances) => {
+      setCurrentBalances(balances)
+    })
+
+    sos.fetchTxns({ db, first: 20 }).then((obj) => {
+      if (obj instanceof Error) throw obj
+      const { cursor, txns } = obj
+      setTransactions(txns)
+    })
+  }, [])
 
   // Custom hooks
+  const priceDiff = currentStackPrice - currentBTCPrice
+  const currentState = priceDiff > 0 ? PRICE_STATES.STACK : PRICE_STATES.SPEND
   const { isSpend, textColor, backgroundColor } = useColors(currentState)
+
+  const premiumDiscount =
+    currentState === PRICE_STATES.STACK
+      ? (currentStackPrice / currentBTCPrice - 1) * 100
+      : (1 - currentStackPrice / currentBTCPrice) * 100
 
   return (
     <ContainerWithColourIntent
@@ -38,40 +102,39 @@ const HomeScreen = () => {
     >
       <View style={{ flexDirection: " row", alignItems: "flex-end" }}>
         <IconButton
-          clickHandler={() => navigation.push("Transactions")}
+          clickHandler={() => navigation.push("Transactions", { transactions })}
           icon={<FontAwesome5 name="list" size={18} color="white" />}
         />
       </View>
       <TextLight color={textColor} size={58}>
         You currently have
       </TextLight>
-      <TextRegular mBottom={40} size={48}>
-        620 000 sats
+      <TextRegular mBottom={20} size={48}>
+        {currentBalances?.sats} sats
+        {/* {"\n"}${currentBalances?.fiat} USD{"\n"} */}
+        {/* {currentBalances.sats / 100_000_000} BTC */}
+      </TextRegular>
+
+      <TextRegular mBottom={40} size={16}>
+        Stack price: {currentStackPrice}
       </TextRegular>
       <TextRegular color={textColor} size={48}>
-        2%
+        {premiumDiscount.toFixed(2)}%
       </TextRegular>
       <TextRegular color={textColor} mBottom={40}>
         will be saved on your next {isSpend ? "spend" : "stack"}
       </TextRegular>
-      <Button
-        onPress={() => {
-          isSpend
-            ? setCurrentState(PRICE_STATES.STACK)
-            : setCurrentState(PRICE_STATES.SPEND)
-        }}
-        title={isSpend ? "Stack" : "Spend"}
-      />
-      <Button
+
+      {/* <Button
         onPress={() => {
           demoSoS()
         }}
         title={"Run backend demo"}
-      />
+      /> */}
       <TextRegular color={textColor} mBottom={12}>
         Your spending
       </TextRegular>
-      {/* <View
+      <View
         style={{
           backgroundColor: isSpend ? "#C5DECF" : "#FFE8BC",
           height: 110,
@@ -84,14 +147,14 @@ const HomeScreen = () => {
         <TextRegular style={{ textAlign: "center" }} color={textColor}>
           Tag transactions to track your spending{" "}
         </TextRegular>
-      </View> */}
-      <View style={{ height: 130 }}>
+      </View>
+      {/* <View style={{ height: 130 }}>
         <ScrollView horizontal>
           {TAGGED.map((item, index) => (
             <TaggedSpendingItem key={index} {...item} />
           ))}
         </ScrollView>
-      </View>
+      </View> */}
       <BottomActions>
         <MainButton
           style={{ flex: 1 }}

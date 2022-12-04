@@ -6,6 +6,8 @@ import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons"
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet"
 import { useCallback, useMemo, useRef, useState } from "react"
 import { satsToUSD } from "../lib/utils"
+import { useNavigation, useRoute } from "@react-navigation/native"
+import { TransactionsRouteProp } from "../navigation/types"
 
 const DATA = [
   {
@@ -33,6 +35,11 @@ const DetailHeading = styled(TextMedium)`
 `
 
 export default function TransactionsScreen() {
+  const route = useRoute<TransactionsRouteProp>()
+  const { transactions } = route.params
+
+  console.log({ transactions })
+
   const bottomSheetRef = useRef<BottomSheet>(null)
   const snapPoints = useMemo(() => ["90%"], [])
 
@@ -65,7 +72,11 @@ export default function TransactionsScreen() {
         <TextRegular mBottom={30} size={40}>
           Transactions
         </TextRegular>
-        <FlatList data={DATA} renderItem={renderItem} keyExtractor={(item) => item.id} />
+        <FlatList
+          data={transactions}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
         <BottomSheet
           ref={bottomSheetRef}
           index={-1}
@@ -120,7 +131,7 @@ type TransactionProps = {
   transactionType: "lightning" | "bitcoin"
 }
 
-const TransactionItem = ({ item }: { item: TransactionProps }) => (
+const TransactionItem = ({ item }: { item: ApiTxn }) => (
   <View
     style={{
       flexDirection: "row",
@@ -139,14 +150,14 @@ const TransactionItem = ({ item }: { item: TransactionProps }) => (
     }}
   >
     <View>
-      {item.type === "send" ? (
+      {item.sats.amountWithFee < 0 ? (
         <Feather name="arrow-up-right" size={24} color="grey" />
       ) : (
         <Feather name="arrow-down-left" size={24} color="grey" />
       )}
     </View>
     <View style={{ flexDirection: "row", alignItems: "center" }}>
-      {item.transactionType === "bitcoin" ? (
+      {/* {item.transactionType === "bitcoin" ? (
         <FontAwesome5
           style={{ marginRight: 8 }}
           name="bitcoin"
@@ -160,16 +171,22 @@ const TransactionItem = ({ item }: { item: TransactionProps }) => (
           size={24}
           color="#E7B416"
         />
-      )}
+      )} */}
+      <MaterialCommunityIcons
+        style={{ marginRight: 8 }}
+        name="lightning-bolt-circle"
+        size={24}
+        color="#E7B416"
+      />
       <View>
         <TextRegular size={14} color="#939393">
-          {item.date}
+          {item.timestamp}
         </TextRegular>
-        <TextRegular size={16}>{item.name}</TextRegular>
+        <TextRegular size={16}>{item.source}</TextRegular>
       </View>
     </View>
     <View>
-      <TextSemibold>{item.sats} sats 💸</TextSemibold>
+      <TextSemibold>{item.sats.amountWithFee} sats 💸</TextSemibold>
     </View>
   </View>
 )

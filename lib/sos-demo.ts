@@ -1,6 +1,12 @@
 import { StackorSpend } from "../sos"
 import { SQLiteDb } from "./get-db"
 
+// TODOS:
+// - getCurrentPrice
+// - currentBalance
+// - ApiTxn.txType
+// - ApiTxn.memo
+
 export const demoSoS = async () => {
   console.log("START")
   const db = SQLiteDb()
