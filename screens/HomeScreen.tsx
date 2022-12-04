@@ -92,7 +92,7 @@ const HomeScreen = () => {
           btnStyle={{ marginHorizontal: 13 }}
         />
         <MainButton
-          clickHandler={() => alert("TODO: Receive flow")}
+          clickHandler={() => navigation.push("Receive")}
           style={{ flex: 1 }}
           title="Receive"
         />

@@ -5,12 +5,10 @@ import type { RouteProp } from "@react-navigation/native"
 export type HomeStackNavigatorParamList = {
   Home: undefined
   Send: undefined
+  Receive: undefined
   TransferComplete: {
     sats: number
-  }
-  Details: {
-    name: string
-    birthYear: string
+    type: "send" | "receive"
   }
 }
 

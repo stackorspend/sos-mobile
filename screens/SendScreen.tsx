@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native"
 import colors from "../styles/colors"
 import { TextBold, TextLight, TextRegular, TextSemibold } from "../styles/typography"
 import MainButton from "../styles/buttons/main-button"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { PRICE_STATES } from "../project-constants"
 import { ContainerWithColourIntent } from "../components/reusables"
 import useColors from "../components/custom-hooks/useColors"
@@ -28,14 +28,22 @@ export default function SendScreen() {
   // State
   const [currentState, setCurrentState] = useState(PRICE_STATES.SPEND)
   const [satsToSend, setSatsAmount] = useState("")
-  const [isTransfer, setIsTransfer] = useState(false)
   const [currentScreenState, setCurrentScreenState] = useState(STATES.INVOICE)
   const [note, setNote] = useState("")
 
   // Custom hooks
-  const { isSpend, textColor, backgroundColor } = useColors(currentState)
+  const { textColor, backgroundColor } = useColors(currentState)
 
-  const toggleSwitch = () => setIsTransfer((previousState) => !previousState)
+  // Effects
+
+  // When the user enters some sats value, update the UI
+  useEffect(() => {
+    if (satsToSend) {
+      setCurrentScreenState(STATES.ENTER_INFORMATION)
+    } else {
+      setCurrentScreenState(STATES.INVOICE)
+    }
+  }, [satsToSend])
 
   const handleNext = () => {
     switch (currentScreenState) {
@@ -48,6 +56,7 @@ export default function SendScreen() {
       case STATES.CONFIRM:
         navigation.navigate("TransferComplete", {
           sats: Number(satsToSend),
+          type: "send",
         })
         return
     }
@@ -63,17 +72,19 @@ export default function SendScreen() {
       </TextLight>
       {/* Hide sats/invoice input when the user is on the confirmation step */}
       {currentScreenState !== STATES.CONFIRM && (
-        <Input
-          style={{ fontSize: satsToSend.length > 0 ? 48 : 16 }}
-          placeholder="Enter the amount of sats to send"
-          // placeholder="Enter invoice, LNURL, or on-chain address here"
-          placeholderTextColor={textColor}
-          onChangeText={(text) => setSatsAmount(text)}
-          defaultValue={satsToSend}
-          returnKeyType="done"
-          blurOnSubmit={true}
-          keyboardType="numeric"
-        />
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Input
+            style={{ fontSize: satsToSend.length > 0 ? 48 : 16 }}
+            placeholder="Enter the amount of sats to send"
+            // placeholder="Enter invoice, LNURL, or on-chain address here"
+            placeholderTextColor={textColor}
+            onChangeText={(text) => setSatsAmount(text)}
+            defaultValue={satsToSend}
+            returnKeyType="done"
+            blurOnSubmit={true}
+            keyboardType="numeric"
+          />
+        </View>
       )}
       {currentScreenState === STATES.INVOICE && (
         <>
@@ -122,7 +133,7 @@ export default function SendScreen() {
               ))}
             </ScrollView>
           </View>
-          <TransferContainer>
+          {/* <TransferContainer>
             <View style={{ flex: 4 }}>
               <TextRegular mBottom={8} color={textColor} size={18}>
                 Transfer?
@@ -141,7 +152,7 @@ export default function SendScreen() {
                 value={isTransfer}
               />
             </View>
-          </TransferContainer>
+          </TransferContainer> */}
         </>
       )}
       {currentScreenState === STATES.CONFIRM && (
@@ -213,11 +224,12 @@ const Input = styled.TextInput`
   border-bottom-width: 1px;
   width: 100%;
   margin-bottom: 30px;
+  flex: 4;
   padding: 4px;
   padding-bottom: 8px;
   font-size: 16px;
   color: black;
-  height: 55px;
+  /* height: 55px; */
 `
 
 const NoteInput = styled.TextInput`

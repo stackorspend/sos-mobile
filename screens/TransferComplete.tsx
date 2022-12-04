@@ -13,7 +13,7 @@ export default function TransferCompleteScreen() {
   const navigation = useNavigation()
   const route = useRoute<TransferCompleteRouteProp>()
 
-  const { sats } = route.params
+  const { sats, type } = route.params
 
   // State
   const [currentState, setCurrentState] = useState(PRICE_STATES.SPEND)
@@ -23,9 +23,12 @@ export default function TransferCompleteScreen() {
   const { textColor, backgroundColor } = useColors(currentState)
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false)
-    }, 2500)
+    setTimeout(
+      () => {
+        setLoading(false)
+      },
+      type === "receive" ? 400 : 2500,
+    )
   }, [])
 
   // Use a fake loading effect for now
@@ -50,7 +53,7 @@ export default function TransferCompleteScreen() {
       </TextLight>
       <>
         <TextRegular style={{ marginTop: 50 }} mBottom={0} color={textColor}>
-          You sent
+          You {type === "receive" ? "received" : "sent"}
         </TextRegular>
         <TextSemibold mBottom={8} size={28}>
           {sats} sats
