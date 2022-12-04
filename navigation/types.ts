@@ -6,6 +6,7 @@ export type HomeStackNavigatorParamList = {
   Home: undefined
   Send: undefined
   Receive: undefined
+  Transactions: undefined
   TransferComplete: {
     sats: number
     type: "send" | "receive"
