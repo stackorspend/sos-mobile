@@ -1,6 +1,6 @@
 import { TableNotCreatedYetError, UnknownRepositoryError } from "../../domain/error"
 
-import { BASE_TXNS_ASC_SELECT, handleRow } from "./requests/select-txns"
+import { BASE_TXNS_ASC_SELECT, handleRow } from "./requests/select-txns-alt"
 
 const REQUESTS_DIR = "./src/services/sqlite/requests"
 
