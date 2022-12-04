@@ -1,27 +1,63 @@
-import sqlite3Pre from "sqlite3"
-import { open } from "sqlite"
+import * as SQLite from "expo-sqlite"
+import { SQLResultSetRowList } from "expo-sqlite"
 
-const sqlite3 = sqlite3Pre.verbose()
+export const SQLiteDb = () => {
+  const db = SQLite.openDatabase("sos_arvinda.db")
 
-export const getDb = async (): Promise<Db> => {
-  const dbConfig = {
-    memory: {
-      path: ":memory:",
-      connectMsg: "Connected to the in-memory SQLite database.",
-    },
-    testDisk: {
-      path: "test.db",
-      connectMsg: "Connected to 'test.db' database.",
-    },
+  const create = async ({ createQuery }: { createQuery: string }): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      db.transaction(
+        (tx) => {
+          tx.executeSql(createQuery, [])
+          // tx.executeSql(insertQuery, row)
+          resolve()
+        },
+        (err) => reject(err),
+      )
+    })
   }
 
-  const { path, connectMsg } = dbConfig.testDisk
+  const insert = async ({
+    insertQuery,
+    row,
+  }: {
+    insertQuery: string
+    row: any[]
+  }): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      db.transaction(
+        (tx) => {
+          tx.executeSql(insertQuery, row)
+          resolve()
+        },
+        (err) => {
+          console.log(err)
+          reject(err)
+        },
+      )
+    })
+  }
 
-  const db = await open({
-    filename: path,
-    driver: sqlite3.Database,
-  })
-  console.log(connectMsg)
+  const select = async ({
+    selectQuery,
+  }: {
+    selectQuery: string
+  }): Promise<SQLResultSetRowList["_array"]> => {
+    return new Promise((resolve, reject) => {
+      db.transaction(
+        (tx) => {
+          tx.executeSql(selectQuery, [], (_, { rows }) => {
+            resolve(rows._array)
+          })
+        },
+        (err) => reject(err),
+      )
+    })
+  }
 
-  return db
+  return {
+    create,
+    insert,
+    select,
+  }
 }

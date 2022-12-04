@@ -1,23 +1,151 @@
-import fs from "fs"
 import axios from "axios"
 
 const galoyRequestsPath = "./src/services/galoy/requests"
 
-const Transactions = fs.readFileSync(`${galoyRequestsPath}/transactions.gql`, "utf8")
-const Balance = fs.readFileSync(`${galoyRequestsPath}/balance.gql`, "utf8")
-const LnSendPayment = fs.readFileSync(`${galoyRequestsPath}/ln-send-payment.gql`, "utf8")
-const LnSendPaymentWithAmount = fs.readFileSync(
-  `${galoyRequestsPath}/ln-send-payment-with-amount.gql`,
-  "utf8",
-)
-const LnWithAmountInvoiceCreate = fs.readFileSync(
-  `${galoyRequestsPath}/ln-with-amount-invoice-create.gql`,
-  "utf8",
-)
-const LnNoAmountInvoiceCreate = fs.readFileSync(
-  `${galoyRequestsPath}/ln-no-amount-invoice-create.gql`,
-  "utf8",
-)
+const Transactions = `
+query transactionsListForContact($first: Int, $after: String) {
+  me {
+    defaultAccount {
+      wallets {
+        ... on BTCWallet {
+          __typename
+          walletCurrency
+          transactions(first: $first, after: $after) {
+              ... TransactionList
+          }
+        }
+      }
+    }
+  }
+}
+
+fragment TransactionList on TransactionConnection {
+  pageInfo {
+    hasNextPage
+  }
+  edges {
+    cursor
+    node {
+      __typename
+      id
+      status
+      direction
+      memo
+      createdAt
+      settlementAmount
+      settlementFee
+      settlementPrice {
+          base
+          offset
+          # currencyUnit
+          # formattedAmount
+      }
+      initiationVia {
+        __typename
+        ... on InitiationViaIntraLedger {
+            counterPartyWalletId
+            counterPartyUsername
+        }
+        ... on InitiationViaLn {
+            paymentHash
+        }
+        ... on InitiationViaOnChain {
+            address
+        }
+      }
+      settlementVia {
+        __typename
+        ... on SettlementViaIntraLedger {
+            counterPartyWalletId
+            counterPartyUsername
+        }
+        ... on SettlementViaLn {
+            paymentSecret
+            preImage
+        }
+        ... on SettlementViaOnChain {
+            transactionHash
+        }
+      }
+    }
+  }
+}
+`
+
+const Balance = `
+query me {
+  me {
+    defaultAccount {
+      wallets {
+        ... on BTCWallet {
+          id
+          balance
+          pendingIncomingBalance
+        }
+      }
+    }
+  }
+}
+`
+
+const LnSendPayment = `
+mutation lnInvoicePaymentSend($input: LnInvoicePaymentInput!) {
+  lnInvoicePaymentSend(input: $input) {
+    status
+    errors {
+      message
+      path
+      code
+    }
+  }
+}
+`
+
+const LnSendPaymentWithAmount = `
+mutation lnNoAmountInvoicePaymentSend($input: LnNoAmountInvoicePaymentInput!) {
+  lnNoAmountInvoicePaymentSend(input: $input) {
+    status
+    errors {
+      message
+      path
+      code
+    }
+  }
+}
+`
+
+const LnWithAmountInvoiceCreate = `
+mutation lnInvoiceCreateInput($input: LnInvoiceCreateInput!) {
+  lnInvoiceCreate(input: $input) {
+    invoice {
+      paymentRequest
+      paymentHash
+      paymentSecret
+      satoshis
+    }
+    errors {
+      message
+      code
+    }
+  }
+}
+`
+
+const LnNoAmountInvoiceCreate = `
+mutation lnNoAmountInvoiceCreate($input: LnNoAmountInvoiceCreateInput!) {
+  lnNoAmountInvoiceCreate(input: $input) {
+    invoice {
+      paymentRequest
+      paymentHash
+      paymentSecret
+    }
+    errors {
+      message
+      code
+    }
+  }
+}
+`
 
 export const Galoy = async ({ endpoint, token }: GaloyConfig) => {
   const defaultHeaders = {

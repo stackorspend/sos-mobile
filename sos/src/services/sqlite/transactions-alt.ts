@@ -1,4 +1,3 @@
-import fs from "fs"
 import { TableNotCreatedYetError, UnknownRepositoryError } from "../../domain/error"
 
 import { BASE_TXNS_ASC_SELECT, handleRow } from "./requests/select-txns-alt"
@@ -10,13 +9,137 @@ const DEFAULT_PAGE_SIZE = 10
 const TXNS_TABLE = "transactions"
 const CALCS_TABLE = "txn_calculations"
 
-const CREATE_TXNS_TABLE = fs.readFileSync(`${REQUESTS_DIR}/create-txns-table.sql`, "utf8")
-const CREATE_CALCS_TABLE = fs.readFileSync(
-  `${REQUESTS_DIR}/create-txn-calcs-table.sql`,
-  "utf8",
+const CREATE_CALCS_TABLE = `
+CREATE TABLE IF NOT EXISTS txn_calculations (
+  source_tx_id TEXT NOT NULL UNIQUE,
+  timestamp TEXT NOT NULL,
+
+  aggregate_sats INTEGER NOT NULL,
+  aggregate_fiat_amount REAL NOT NULL,
+  stack_price_with_pl_included REAL NOT NULL,
+
+  fiat_amount_less_pl REAL NOT NULL,
+  fiat_pl REAL NOT NULL,
+  fiat_pl_percentage TEXT NOT NULL,
+  aggregate_fiat_amount_less_pl REAL NOT NULL,
+  stack_price_without_pl REAL NOT NULL
 )
-const INSERT_TXN = fs.readFileSync(`${REQUESTS_DIR}/insert-txn-alt.sql`, "utf8")
-const INSERT_CALC = fs.readFileSync(`${REQUESTS_DIR}/upsert-calc-alt.sql`, "utf8")
+`
+
+const CREATE_TXNS_TABLE_WITH_GENERATED = `
+CREATE TABLE IF NOT EXISTS transactions (
+  sats_amount_with_fee INTEGER NOT NULL,
+  sats_fee INTEGER NOT NULL,
+  timestamp TEXT NOT NULL,
+  fiat_per_sat INTEGER NOT NULL,
+  fiat_per_sat_offset INTEGER NOT NULL,
+  fiat_code TEXT NOT NULL,
+  fiat_amount_with_fee REAL GENERATED ALWAYS AS (
+      ROUND(
+          sats_amount_with_fee * fiat_per_sat / POWER(10, fiat_per_sat_offset),
+          4
+      )
+  ) STORED,
+  fiat_fee REAL GENERATED ALWAYS AS (
+      ROUND(
+          sats_fee * fiat_per_sat / POWER(10, fiat_per_sat_offset),
+          4
+      )
+  ) STORED,
+  source_name TEXT NOT NULL,
+  source_tx_id TEXT NOT NULL UNIQUE,
+  tx_status TEXT NOT NULL,
+  ln_payment_hash TEXT,
+  onchain_tx_id TEXT
+)
+`
+
+const CREATE_TXNS_TABLE = `
+CREATE TABLE IF NOT EXISTS transactions (
+  sats_amount_with_fee INTEGER NOT NULL,
+  sats_fee INTEGER NOT NULL,
+  timestamp TEXT NOT NULL,
+  fiat_per_sat INTEGER NOT NULL,
+  fiat_per_sat_offset INTEGER NOT NULL,
+  fiat_code TEXT NOT NULL,
+  fiat_amount_with_fee REAL,
+  fiat_fee REAL,
+  source_name TEXT NOT NULL,
+  source_tx_id TEXT NOT NULL UNIQUE,
+  tx_status TEXT NOT NULL,
+  ln_payment_hash TEXT,
+  onchain_tx_id TEXT
+)
+`
+
+const INSERT_TXN = `
+INSERT INTO transactions (
+  sats_amount_with_fee,
+  sats_fee,
+  timestamp,
+  fiat_per_sat,
+  fiat_per_sat_offset,
+  fiat_code,
+  source_name,
+  source_tx_id,
+  ln_payment_hash,
+  onchain_tx_id,
+  tx_status,
+  fiat_amount_with_fee,
+  fiat_fee
+) VALUES (
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?
+)
+`
+
+const INSERT_CALC = `
+INSERT INTO txn_calculations (
+  source_tx_id,
+  timestamp,
+
+  aggregate_sats,
+  aggregate_fiat_amount,
+  stack_price_with_pl_included,
+  fiat_amount_less_pl,
+  fiat_pl,
+  fiat_pl_percentage,
+  aggregate_fiat_amount_less_pl,
+  stack_price_without_pl
+) VALUES (
+  ?,
+  ?,
+
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?
+)
+ON CONFLICT(source_tx_id) DO UPDATE SET
+  aggregate_sats = ?,
+  aggregate_fiat_amount = ?,
+  stack_price_with_pl_included = ?,
+  fiat_amount_less_pl = ?,
+  fiat_pl = ?,
+  fiat_pl_percentage = ?,
+  aggregate_fiat_amount_less_pl = ?,
+  stack_price_without_pl = ?
+`
 
 const SELECT_LATEST_CALC = `
   SELECT * FROM ${CALCS_TABLE}
@@ -218,23 +341,30 @@ export const TransactionsRepositoryAlt = (db: SqliteDb) => {
       const start = Date.now()
 
       for (const txn of rows) {
+        const fiat_per_sat = Math.round(txn.price * 10 ** 4)
+
+        const row = [
+          txn.sats, // [":sats_amount_with_fee"]
+          txn.satsFee, // [":sats_fee"]
+          new Date(txn.timestamp * 1000).toISOString(), // [":timestamp"]
+          fiat_per_sat, // [":fiat_per_sat"]
+          12, // [":fiat_per_sat_offset"]
+          "USD", // [":fiat_code"]
+          "galoy", // [":source_name"]
+          txn.id, // [":source_tx_id"]
+          txn.paymentHash, // [":ln_payment_hash"]
+          txn.txId, // [":onchain_tx_id"]
+
+          // TODO: figure how to check & finalize pending txns
+          txn.status, // [":tx_status"]
+
+          (txn.sats * fiat_per_sat) / 10 ** 12, // [":fiat_amount_with_fee"]
+          (txn.satsFee * fiat_per_sat) / 10 ** 12, // [":fiat_fee"]
+        ]
+
         await db.insert({
           query: INSERT_TXN,
-          row: [
-            txn.sats, // [":sats_amount_with_fee"]
-            txn.satsFee, // [":sats_fee"]
-            new Date(txn.timestamp * 1000).toISOString(), // [":timestamp"]
-            Math.round(txn.price * 10 ** 4), // [":fiat_per_sat"]
-            12, // [":fiat_per_sat_offset"]
-            "USD", // [":fiat_code"]
-            "galoy", // [":source_name"]
-            txn.id, // [":source_tx_id"]
-            txn.paymentHash, // [":ln_payment_hash"]
-            txn.txId, // [":onchain_tx_id"]
-
-            // TODO: figure how to check & finalize pending txns
-            txn.status, // [":tx_status"]
-          ],
+          row,
         })
       }
 
