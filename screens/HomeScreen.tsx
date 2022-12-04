@@ -11,6 +11,7 @@ import IconButton from "../styles/buttons/icon-button"
 import { PRICE_STATES } from "../project-constants"
 import { ContainerWithColourIntent } from "../components/reusables"
 import useColors from "../components/custom-hooks/useColors"
+import { demoSoS } from "../lib/sos-demo"
 
 const TAGGED = [
   {
@@ -55,6 +56,12 @@ const HomeScreen = () => {
             : setCurrentState(PRICE_STATES.SPEND)
         }}
         title={isSpend ? "Stack" : "Spend"}
+      />
+      <Button
+        onPress={() => {
+          demoSoS()
+        }}
+        title={"Run backend demo"}
       />
       <TextRegular color={textColor} mBottom={12}>
         Your spending
