@@ -5,14 +5,13 @@ import { HomeScreenNavigationProp } from "../navigation/types"
 import colors from "../styles/colors"
 import { TextBold, TextLight, TextRegular } from "../styles/typography"
 import MainButton from "../styles/buttons/main-button"
-import { useState } from "react"
-import { FontAwesome } from "@expo/vector-icons"
+import { useEffect, useState } from "react"
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons"
 import IconButton from "../styles/buttons/icon-button"
 import { PRICE_STATES } from "../project-constants"
 import { ContainerWithColourIntent } from "../components/reusables"
 import useColors from "../components/custom-hooks/useColors"
 import { demoSoS } from "../lib/sos-demo"
-
 const TAGGED = [
   {
     tag: "Dining",
@@ -37,6 +36,12 @@ const HomeScreen = () => {
       color={backgroundColor}
       style={{ flex: 1, paddingTop: 70, paddingHorizontal: 12 }}
     >
+      <View style={{ flexDirection: " row", alignItems: "flex-end" }}>
+        <IconButton
+          clickHandler={() => navigation.push("Transactions")}
+          icon={<FontAwesome5 name="list" size={18} color="white" />}
+        />
+      </View>
       <TextLight color={textColor} size={58}>
         You currently have
       </TextLight>
@@ -99,7 +104,7 @@ const HomeScreen = () => {
           btnStyle={{ marginHorizontal: 13 }}
         />
         <MainButton
-          clickHandler={() => alert("TODO: Receive flow")}
+          clickHandler={() => navigation.push("Receive")}
           style={{ flex: 1 }}
           title="Receive"
         />
