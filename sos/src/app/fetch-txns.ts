@@ -1,14 +1,6 @@
 import { TransactionsRepository } from "../services/sqlite"
 
-export const fetchTxns = async ({
-  db,
-  first,
-  after,
-}: {
-  db: Db
-  first?: number
-  after?: string
-}) => {
+export const fetchTxns = async ({ db, first, after }: FetchTxnsArgs): FetchTxnsResult => {
   const txns = await TransactionsRepository(db).fetchTxns({
     first,
     after,
@@ -21,7 +13,7 @@ export const fetchTxns = async ({
   }
 }
 
-const mapTxns = (txn) => {
+const mapTxns = (txn): ApiTxn => {
   // TODO: if txn is 'canceled' then set fee to '0'
   const { sats_amount_with_fee: satsAmountWithFee, sats_fee: satsFee } = txn
   const satsAmount = Number((satsAmountWithFee - satsFee).toFixed(4))

@@ -5,14 +5,10 @@ import { IMPORT_PAGE_SIZE, syncLatestTxns, SYNC_PAGE_SIZE } from "./sync-txns"
 
 export const payNoAmountLnInvoice = async ({
   db,
+  galoy: galoyConfig,
   ...args
-}: {
-  db: Db
-  noAmountPaymentRequest: string
-  amount: number
-  memo: string
-}) => {
-  const galoy = await Galoy()
+}: PayNoAmountLnInvoiceArgs & Config) => {
+  const galoy = await Galoy(galoyConfig)
   if (galoy instanceof Error) return galoy
 
   const sendResult = await galoy.sendLnPaymentWithAmount(args)
@@ -23,6 +19,7 @@ export const payNoAmountLnInvoice = async ({
   const synced = await syncLatestTxns({
     db,
     pageSize: exists ? SYNC_PAGE_SIZE : IMPORT_PAGE_SIZE,
+    galoy: galoyConfig,
   })
   if (synced instanceof Error) return synced
 

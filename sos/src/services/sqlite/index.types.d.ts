@@ -56,4 +56,11 @@ type CalcRow = {
   stack_price_without_pl
 }
 
-type Db = import("sqlite").Database
+type SqliteDb = {
+  create: (query: string) => Promise<void>
+  insert: ({ query, row }: { query: string; row: any[] }) => Promise<void>
+  select: ({ query, args }: { query: string; args?: any[] }) => Promise<any[]>
+  db?: any
+}
+
+type Db = import("sqlite").Database | SQLiteDb

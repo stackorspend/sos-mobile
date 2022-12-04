@@ -75,22 +75,22 @@ export const handleRow = ({ acc, prev, row }: { acc; prev; row }) => {
   }
 }
 
-export const selectTxns = async (db) => {
+export const selectTxns = async (db: SqliteDb) => {
   // @ts-ignore-next-line no-implicit-any error
-  const { acc, rows } = await new Promise((resolve) => {
+  const { acc, rows } = await new Promise(async (resolve) => {
     let acc = { avg_price_no_pl: 0, agg_fiat_no_pl: 0 }
     let prev = { prev_agg_sats: 0, prev_avg_price: 0 }
 
     let newRow,
       newRows = []
-    db.all(BASE_TXNS_ASC_SELECT, (err, rows) => {
-      for (const row of rows) {
-        ;({ acc, prev, row: newRow } = handleRow({ acc, prev, row }))
-        // @ts-ignore-next-line no-implicit-any error
-        newRows.push(newRow)
-      }
-      resolve({ acc, rows: newRows })
-    })
+    const rows = await db.select({ query: BASE_TXNS_ASC_SELECT })
+
+    for (const row of rows) {
+      ;({ acc, prev, row: newRow } = handleRow({ acc, prev, row }))
+      // @ts-ignore-next-line no-implicit-any error
+      newRows.push(newRow)
+    }
+    resolve({ acc, rows: newRows })
   })
 
   return rows

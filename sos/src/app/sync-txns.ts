@@ -15,17 +15,14 @@ export const syncLatestTxns = async ({
   pageSize,
   rescanForMissing = false,
   rebuild = false,
-}: {
-  db: Db
-  pageSize: number
-  rescanForMissing?: boolean // continues scanning through all txns to find all missing txns
-  rebuild?: boolean // drops table and does full rebuild
-}) => {
+
+  galoy: galoyConfig,
+}: SyncTxnsArgs & Config) => {
   // TODO: Figure out how to fix mismatched/corrupted txns on rescanForMissing
 
   const txnsRepo = TransactionsRepository(db)
 
-  const galoy = await Galoy()
+  const galoy = await Galoy(galoyConfig)
   if (galoy instanceof Error) {
     return galoy
   }
