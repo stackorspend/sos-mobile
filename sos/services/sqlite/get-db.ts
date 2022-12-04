@@ -1,89 +1,63 @@
 import * as SQLite from "expo-sqlite"
 import { SQLResultSetRowList } from "expo-sqlite"
 
-//const sqlite3 = sqlite3Pre.verbose()
+export const SQLiteDb = () => {
+  const db = SQLite.openDatabase("sos_arvinda.db")
 
-const queryCreate = `
-CREATE TABLE IF NOT EXISTS transactions (
-  sats_amount_with_fee INTEGER NOT NULL,
-  sats_fee TEXT NOT NULL
-);
-`
-
-const queryInsert = `
-INSERT INTO transactions (
-  sats_amount_with_fee,
-  sats_fee
-) VALUES (
-  ?,
-  ?
-);
-`
-
-export const getDb = async (): Promise<Db> => {
-  const dbConfig = {
-    memory: {
-      path: ":memory:",
-      connectMsg: "Connected to the in-memory SQLite database.",
-    },
-    testDisk: {
-      path: "test.db",
-      connectMsg: "Connected to 'test.db' database.",
-    },
+  const create = async ({ createQuery }: { createQuery: string }): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      db.transaction(
+        (tx) => {
+          tx.executeSql(createQuery, [])
+          // tx.executeSql(insertQuery, row)
+          resolve()
+        },
+        (err) => reject(err),
+      )
+    })
   }
 
-  // const db = await open({
-  //   filename: path,
-  //   driver: sqlite3.Database,
-  // })
+  const insert = async ({
+    insertQuery,
+    row,
+  }: {
+    insertQuery: string
+    row: any[]
+  }): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      db.transaction(
+        (tx) => {
+          tx.executeSql(insertQuery, row)
+          resolve()
+        },
+        (err) => {
+          console.log(err)
+          reject(err)
+        },
+      )
+    })
+  }
 
-  return SQLite.openDatabase("sos_arvinda.db")
-}
+  const select = async ({
+    selectQuery,
+  }: {
+    selectQuery: string
+  }): Promise<SQLResultSetRowList["_array"]> => {
+    return new Promise((resolve, reject) => {
+      db.transaction(
+        (tx) => {
+          tx.executeSql(selectQuery, [], (_, { rows }) => {
+            resolve(rows._array)
+          })
+        },
+        (err) => reject(err),
+      )
+    })
+  }
 
-/** 
-export const select = async (
-  callback: (rows: SQLResultSetRowList) => void,
-) => {
-  const db = SQLite.openDatabase("sos_arvinda.db")
-  db.transaction(
-    (tx) => {
-      tx.executeSql(queryCreate, [])
-      tx.executeSql(queryInsert, [200, "50"])
-      //tx.executeSql("SELECT * FROM transactions;", [], (_, { rows }) => console.log(rows))
-    },
-    (err) => console.log(err),
-  )
-  let rowList: SQLResultSetRowList = null
-
-  db.transaction(
-    (tx) => {
-      tx.executeSql("SELECT * FROM transactions;", [], (_, { rows }) => callback(rows))
-    },
-    (err) => console.log(err),
-  )
-} */
-
-export const select = async (): Promise<SQLResultSetRowList> => {
-  return new Promise((resolve, reject) => {
-    console.log("trax")
-    const db = SQLite.openDatabase("sos_arvinda.db")
-    db.transaction(
-      (tx) => {
-        tx.executeSql(queryCreate, [])
-        tx.executeSql(queryInsert, [200, "50"])
-      },
-      (err) => reject(err),
-    )
-
-    console.log("trax")
-
-    db.transaction(
-      (tx) => {
-        tx.executeSql("SELECT * FROM transactions;", [], (_, { rows }) => resolve(rows))
-      },
-      (err) => reject(err),
-    )
-
-    console.log("trax2")
-  })
+  return {
+    create,
+    insert,
+    select,
+  }
 }

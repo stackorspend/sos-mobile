@@ -5,7 +5,7 @@ import { HomeScreenNavigationProp } from "../navigation/types"
 import colors from "../styles/colors"
 import { TextBold, TextLight, TextRegular } from "../styles/typography"
 import MainButton from "../styles/buttons/main-button"
-import { select, getDb } from "../sos/services/sqlite/get-db"
+import { SQLiteDb } from "../sos/services/sqlite/get-db"
 import { useEffect } from "react"
 
 const TAGGED = [
@@ -25,8 +25,36 @@ const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>()
 
   useEffect(() => {
-    const rows = async () => select().then((resp: any) => console.log(resp))
-    console.log(rows)
+    const rows = async () => {
+      const createQuery = `
+        CREATE TABLE IF NOT EXISTS transactions (
+          sats_amount_with_fee INTEGER NOT NULL,
+          sats_fee TEXT NOT NULL
+        );
+        `
+
+      const insertQuery = `
+        INSERT INTO transactions (
+          sats_amount_with_fee,
+          sats_fee
+        ) VALUES (
+          ?,
+          ?
+        );
+        `
+      console.log('START')
+      const sql = SQLiteDb()
+
+      await sql.create({ createQuery })
+
+      const insertRow = [300, "50"]
+      await sql.insert({insertQuery, row: insertRow})
+
+      const rows = await sql.select({selectQuery: "SELECT * FROM transactions;"})
+      console.log('Rows:', rows)
+    }
+
+    rows()
   }, [])
 
   return (
