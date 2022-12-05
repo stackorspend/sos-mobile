@@ -15,6 +15,7 @@ const HomeStackNavigator = () => {
     <HomeStack.Navigator
       screenOptions={{
         headerShown: false,
+        fullScreenGestureEnabled: true,
       }}
     >
       <HomeStack.Screen name="Home" component={HomeScreen} />
