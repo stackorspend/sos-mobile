@@ -1,10 +1,16 @@
-import { View, Pressable, Button } from "react-native"
+import { View, Pressable, Button, TextInput } from "react-native"
 import styled from "styled-components/native"
 import { useNavigation } from "@react-navigation/native"
 import { HomeScreenNavigationProp } from "../navigation/types"
-import { TextBold, TextLight, TextMedium, TextRegular } from "../styles/typography"
+import {
+  TextBold,
+  TextLight,
+  TextMedium,
+  TextRegular,
+  TextSemibold,
+} from "../styles/typography"
 import MainButton from "../styles/buttons/main-button"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons"
 import IconButton from "../styles/buttons/icon-button"
 import { PRICE_STATES } from "../project-constants"
@@ -14,6 +20,7 @@ import { demoSoS } from "../lib/sos-demo"
 import { StackorSpend } from "../sos"
 import { SQLiteDb } from "../lib/get-db"
 import { toCurrency, toFormattedNumber } from "../lib/utils"
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet"
 
 const TAGGED = [
   {
@@ -37,6 +44,8 @@ const TAGGED = [
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>()
+  const bottomSheetRef = useRef<BottomSheet>(null)
+  const snapPoints = useMemo(() => ["25%"], [])
 
   // State
   const [sosDB, setSoSDB] = useState(null)
@@ -49,7 +58,9 @@ const HomeScreen = () => {
   } | null>(null)
   const [transactions, setTransactions] = useState<any[]>([])
   const [assetDisplay, setAssetDisplay] = useState<"sats" | "fiat" | "btc">("sats")
-  const [galoyToken, setGaloyToken] = useState<string | null>(null)
+  const [galoyToken, setGaloyToken] = useState<string | null>(
+    "nWL9JckgHA6uMjwuz6kkYrAowrpNXSas",
+  )
 
   // Effects
   useEffect(() => {
@@ -58,7 +69,7 @@ const HomeScreen = () => {
     const sos = StackorSpend({
       galoy: {
         endpoint: "https://api.staging.galoy.io/graphql/",
-        token: "nWL9JckgHA6uMjwuz6kkYrAowrpNXSas",
+        token: galoyToken,
       },
     })
     setSoS(sos)
@@ -100,6 +111,18 @@ const HomeScreen = () => {
         console.log(err.message)
       })
   }, [])
+
+  const renderBackdrop = useCallback(
+    (props) => (
+      <BottomSheetBackdrop
+        {...props}
+        opacity={0.8}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+      />
+    ),
+    [],
+  )
 
   // Custom hooks
   const priceDiff = currentStackPrice - currentBTCPrice
@@ -150,6 +173,10 @@ const HomeScreen = () => {
     )
   }
 
+  const randomIntFromInterval = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1) + min)
+  }
+
   return (
     <ContainerWithColourIntent
       color={backgroundColor}
@@ -181,20 +208,27 @@ const HomeScreen = () => {
       <TextRegular color={textColor} mBottom={12}>
         Your spending
       </TextRegular>
-      <View
-        style={{
-          backgroundColor: isSpend ? "#C5DECF" : "#FFE8BC",
-          height: 110,
-          borderRadius: 8,
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: 8,
-        }}
-      >
-        <TextRegular style={{ textAlign: "center" }} color={textColor}>
-          Tag transactions to track your spending{" "}
-        </TextRegular>
-      </View>
+      <Pressable onLongPress={() => bottomSheetRef.current.expand()}>
+        <View
+          style={{
+            backgroundColor: isSpend ? "#C5DECF" : "#FFE8BC",
+            height: 110,
+            borderRadius: 8,
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 8,
+          }}
+        >
+          <TextRegular style={{ textAlign: "center" }} color={textColor}>
+            Tag transactions to track your spending{" "}
+          </TextRegular>
+        </View>
+      </Pressable>
+      <Pressable onPress={() => setCurrentBTCPrice(randomIntFromInterval(10000, 30000))}>
+        <TextMedium style={{ marginTop: 20 }}>
+          Shuffle Current BTC Price | {toCurrency(currentBTCPrice)}
+        </TextMedium>
+      </Pressable>
       {/* <View style={{ height: 130 }}>
         <ScrollView horizontal>
           {TAGGED.map((item, index) => (
@@ -233,6 +267,28 @@ const HomeScreen = () => {
           title="Receive"
         />
       </BottomActions>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        enablePanDownToClose
+        snapPoints={snapPoints}
+        backdropComponent={renderBackdrop}
+      >
+        <View style={{ padding: 20 }}>
+          <TextSemibold mBottom={40} size={18} style={{ textAlign: "center" }}>
+            Set Galoy Token
+          </TextSemibold>
+          <Input
+            placeholder="Paste your galoy app token here..."
+            // placeholderTextColor={textColor}
+            onChangeText={(text) => setGaloyToken(text)}
+            defaultValue={galoyToken}
+            returnKeyType="done"
+            blurOnSubmit={true}
+            keyboardType="text"
+          />
+        </View>
+      </BottomSheet>
     </ContainerWithColourIntent>
   )
 }
@@ -277,4 +333,16 @@ const BottomActions = styled.View`
   align-items: center;
   justify-content: center;
   width: 100%;
+`
+
+const Input = styled.TextInput`
+  border-bottom-color: rgba(0, 0, 0, 0.2);
+  border-bottom-width: 1px;
+  width: 100%;
+  margin-bottom: 30px;
+  padding: 4px;
+  padding-bottom: 8px;
+  font-size: 16px;
+  color: black;
+  /* height: 55px; */
 `
