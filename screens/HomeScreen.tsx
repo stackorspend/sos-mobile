@@ -28,11 +28,11 @@ const TAGGED = [
 // TODO:
 // - Number formatting ✅
 // - Stack price ✅
-// - tappable toggle for price
+// - tappable toggle for price ✅
 // - transactions list clean up
 // - toggle for bitcoin's current price
-// - add a way to accept a unique token
-// - add splash screen and logo
+// - add a way to accept a unique token, store this in localstorage
+// - add splash screen and logon ✅
 // - pass around correct stack/spend state
 
 const HomeScreen = () => {
@@ -49,6 +49,7 @@ const HomeScreen = () => {
   } | null>(null)
   const [transactions, setTransactions] = useState<any[]>([])
   const [assetDisplay, setAssetDisplay] = useState<"sats" | "fiat" | "btc">("sats")
+  const [galoyToken, setGaloyToken] = useState<string | null>(null)
 
   // Effects
   useEffect(() => {
@@ -127,7 +128,7 @@ const HomeScreen = () => {
   const renderAssetDisplay = () => {
     return (
       <Pressable onPress={toggleAssetDisplay}>
-        <TextLight color={textColor} size={58}>
+        <TextLight color={textColor} size={54}>
           You currently have
         </TextLight>
         {assetDisplay === "sats" && (
