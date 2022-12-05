@@ -1,4 +1,3 @@
-import React from "react"
 import { PRICE_STATES } from "../../project-constants"
 import colors from "../../styles/colors"
 
@@ -8,10 +7,6 @@ const useColors = (currentState) => {
   const isStack = currentState === PRICE_STATES.STACK
   const textColor = isSpend ? colors.primaryGreen : colors.cautiousDark
   const backgroundColor = isSpend ? colors.positive : colors.cautious
-
-  console.log({ isSpend })
-  console.log({ isStack })
-  console.log({ textColor })
 
   return {
     isSpend,
