@@ -1,5 +1,5 @@
 import styled from "styled-components/native"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native"
 import colors from "../styles/colors"
 import { TextLight, TextRegular, TextSemibold } from "../styles/typography"
 import MainButton from "../styles/buttons/main-button"
@@ -8,7 +8,7 @@ import { PRICE_STATES } from "../project-constants"
 import { ContainerWithColourIntent } from "../components/reusables"
 import useColors from "../components/custom-hooks/useColors"
 import QRCode from "react-native-qrcode-svg"
-import { SendScreenNavigationProp } from "../navigation/types"
+import { ReceiveScreenRouteProp, SendScreenNavigationProp } from "../navigation/types"
 import { View } from "react-native"
 const TAGS = ["Dining", "Health", "Groceries", "Dining"]
 
@@ -20,6 +20,9 @@ const STATES = {
 
 export default function ReceiveScreen() {
   const navigation = useNavigation<SendScreenNavigationProp>()
+  const route = useRoute<ReceiveScreenRouteProp>()
+
+  const { premiumDiscount, currentBTCPrice, currentStackPrice } = route.params
 
   // State
   const [currentState, setCurrentState] = useState(PRICE_STATES.SPEND)
@@ -39,11 +42,10 @@ export default function ReceiveScreen() {
         navigation.navigate("TransferComplete", {
           sats: Number(satsToSend),
           type: "receive",
-        })
-      case STATES.CONFIRM:
-        navigation.navigate("TransferComplete", {
-          sats: Number(satsToSend),
-          type: "receive",
+          premiumDiscount,
+          currentBTCPrice,
+          currentStackPrice,
+          currentState: "stack",
         })
         return
     }

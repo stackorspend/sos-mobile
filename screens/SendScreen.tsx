@@ -1,6 +1,6 @@
 import { View, Button, Switch, ScrollView } from "react-native"
 import styled from "styled-components/native"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native"
 import colors from "../styles/colors"
 import { TextBold, TextLight, TextRegular, TextSemibold } from "../styles/typography"
 import MainButton from "../styles/buttons/main-button"
@@ -12,7 +12,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons"
 import IconButton from "../styles/buttons/icon-button"
 import { Octicons } from "@expo/vector-icons"
 import { satsToUSD, toCurrency, toFormattedNumber } from "../lib/utils"
-import { SendScreenNavigationProp } from "../navigation/types"
+import { SendScreenNavigationProp, SendScreenRouteProp } from "../navigation/types"
 
 const TAGS = ["Dining", "Health", "Groceries", "Dining"]
 
@@ -24,9 +24,17 @@ const STATES = {
 
 export default function SendScreen() {
   const navigation = useNavigation<SendScreenNavigationProp>()
+  const route = useRoute<SendScreenRouteProp>()
+
+  const {
+    currentBalances,
+    currentState,
+    premiumDiscount,
+    currentBTCPrice,
+    currentStackPrice,
+  } = route.params
 
   // State
-  const [currentState, setCurrentState] = useState(PRICE_STATES.SPEND)
   const [satsToSend, setSatsAmount] = useState("")
   const [currentScreenState, setCurrentScreenState] = useState(STATES.INVOICE)
   const [note, setNote] = useState("")
@@ -54,9 +62,13 @@ export default function SendScreen() {
         setCurrentScreenState(STATES.CONFIRM)
         return
       case STATES.CONFIRM:
-        navigation.navigate("TransferComplete", {
+        navigation.push("TransferComplete", {
           sats: Number(satsToSend),
           type: "send",
+          currentStackPrice,
+          currentBTCPrice,
+          premiumDiscount,
+          currentState,
         })
         return
     }
@@ -106,14 +118,19 @@ export default function SendScreen() {
       {currentScreenState === STATES.ENTER_INFORMATION && (
         <>
           <TextRegular mBottom={10} size={24} color={textColor}>
-            US{toCurrency(satsToUSD(parseFloat(satsToSend), 16971.09))}
+            US{toCurrency(satsToUSD(parseFloat(satsToSend), currentBTCPrice))}
           </TextRegular>
           <TextBold mBottom={4} color={textColor}>
             Balance after:
           </TextBold>
-          <TextRegular color={textColor}>{toFormattedNumber(18923451)} sats</TextRegular>
+          <TextRegular color={textColor}>
+            {toFormattedNumber(currentBalances.sats - Number(satsToSend))} sats
+          </TextRegular>
           <TextRegular mBottom={20} color={textColor}>
-            US{toCurrency(2000)}
+            US
+            {toCurrency(
+              currentBalances.fiat - satsToUSD(parseFloat(satsToSend), currentBTCPrice),
+            )}
           </TextRegular>
           <NoteInput
             placeholder="📝 Add note"
@@ -167,7 +184,8 @@ export default function SendScreen() {
             Fee ~3 sats ⚡️
           </TextMedium> */}
           <TextRegular color={textColor} style={{ textAlign: "center" }}>
-            You will have a 2% on this transaction based on your average buying price
+            You will save {premiumDiscount.toFixed(2)}% on this transaction based on your
+            average buying price
           </TextRegular>
         </>
       )}
