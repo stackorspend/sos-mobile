@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS transactions (
   source_name TEXT NOT NULL,
   source_tx_id TEXT NOT NULL UNIQUE,
   tx_status TEXT NOT NULL,
+  tx_description TEXT NOT NULL,
   ln_payment_hash TEXT,
   onchain_tx_id TEXT
 )
@@ -67,6 +68,7 @@ CREATE TABLE IF NOT EXISTS transactions (
   source_name TEXT NOT NULL,
   source_tx_id TEXT NOT NULL UNIQUE,
   tx_status TEXT NOT NULL,
+  tx_description TEXT NOT NULL,
   ln_payment_hash TEXT,
   onchain_tx_id TEXT
 )
@@ -85,9 +87,11 @@ INSERT INTO transactions (
   ln_payment_hash,
   onchain_tx_id,
   tx_status,
+  tx_description,
   fiat_amount_with_fee,
   fiat_fee
 ) VALUES (
+  ?,
   ?,
   ?,
   ?,
@@ -357,6 +361,7 @@ export const TransactionsRepositoryAlt = (db: SqliteDb) => {
 
           // TODO: figure how to check & finalize pending txns
           txn.status, // [":tx_status"]
+          txn.description, // [":tx_description"]
 
           (txn.sats * fiat_per_sat) / 10 ** 12, // [":fiat_amount_with_fee"]
           (txn.satsFee * fiat_per_sat) / 10 ** 12, // [":fiat_fee"]

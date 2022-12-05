@@ -59,6 +59,7 @@ export const syncLatestTxns = async ({
         settlementPrice: { base },
         createdAt: timestamp,
         status,
+        memo,
         initiationVia: { paymentHash, address },
         settlementVia: { transactionHash: txId },
       } = tx.node
@@ -79,6 +80,7 @@ export const syncLatestTxns = async ({
         satsFee: -settlementFee,
         price: base / 10 ** 6,
         status,
+        description: memo || "",
         paymentHash,
         txId,
       })

@@ -28,6 +28,7 @@ const mapTxns = (txn): ApiTxn => {
     source: txn.source_name,
     sourceId: txn.source_tx_id,
     txStatus: txn.tx_status,
+    txDescription: txn.tx_description,
     sats: {
       amountWithFee: satsAmountWithFee,
       amount: satsAmount,

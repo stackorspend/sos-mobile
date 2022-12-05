@@ -29,6 +29,7 @@ type ApiTxn = {
   source: string
   sourceId: string
   txStatus: TxStatus
+  txDescription: string
   sats: {
     amountWithFee: number
     amount: number
