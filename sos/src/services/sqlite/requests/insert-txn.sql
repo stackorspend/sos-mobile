@@ -9,7 +9,8 @@ INSERT INTO transactions (
     source_tx_id,
     ln_payment_hash,
     onchain_tx_id,
-    tx_status
+    tx_status,
+    tx_description
 ) VALUES (
     :sats_amount_with_fee,
     :sats_fee,
@@ -21,5 +22,6 @@ INSERT INTO transactions (
     :source_tx_id,
     :ln_payment_hash,
     :onchain_tx_id,
-    :tx_status
+    :tx_status,
+    :tx_description
 )
