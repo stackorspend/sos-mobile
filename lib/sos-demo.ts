@@ -2,7 +2,6 @@ import { StackorSpend } from "../sos"
 import { SQLiteDb } from "./get-db"
 
 // TODOS:
-// - getCurrentPrice
 // - currentBalance
 // - ApiTxn.txType
 // - ApiTxn.memo
@@ -55,5 +54,9 @@ export const demoSoS = async () => {
   if (step3) {
     const stackCost = await sos.getStackCost(db)
     console.log("Current (DCA'd) stack cost is:", stackCost)
+
+    const btcPrice = await sos.getCurrentPrice()
+    if (btcPrice instanceof Error) throw btcPrice
+    console.log("Current BTC price is:", btcPrice.usdPerBtc)
   }
 }

@@ -2,6 +2,7 @@ import {
   fetchTxns,
   syncLatestTxns,
   getStackCost,
+  getCurrentPrice,
   payNoAmountLnInvoice,
   payWithAmountLnInvoice,
   receiveLnNoAmount,
@@ -17,7 +18,7 @@ export const StackorSpend = (config: {
 
     fetchTxns,
     getStackCost,
-    // getCurrentPrice,
+    getCurrentPrice: () => getCurrentPrice(config),
     // checkPlannedStackTxn,
     // checkPlannedSpendTxn,
 

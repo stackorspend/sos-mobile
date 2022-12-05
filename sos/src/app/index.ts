@@ -1,6 +1,7 @@
 export * from "./fetch-txns"
 export * from "./sync-txns"
 export * from "./get-stack-cost"
+export * from "./get-current-price"
 export * from "./pay-no-amount-ln-invoice"
 export * from "./pay-with-amount-ln-invoice"
 export * from "./receive-ln-no-amount"
