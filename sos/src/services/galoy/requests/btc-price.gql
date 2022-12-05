@@ -1,0 +1,8 @@
+query btcPrice {
+  btcPrice {
+    base
+    currencyUnit
+    formattedAmount
+    offset
+  }
+}

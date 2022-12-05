@@ -45,6 +45,8 @@ type ApiTxn = {
   gainLoss: string
 }
 
+type GetCurrentPriceResult = Promise<{ usdPerBtc: number } | Error>
+
 type PayNoAmountLnInvoiceArgs = {
   db: Db
   noAmountPaymentRequest: string
@@ -85,6 +87,7 @@ type StackorSpend = {
 
   fetchTxns: (args: FetchTxnsArgs) => FetchTxnsResult
   getStackCost: (db: Db) => Promise<number | Error>
+  getCurrentPrice: () => GetCurrentPriceResult
 
   payNoAmountLnInvoice: (args: PayNoAmountLnInvoiceArgs) => PayLnInvoiceResult
   payWithAmountLnInvoice: (args: PayWithAmountLnInvoiceArgs) => PayLnInvoiceResult

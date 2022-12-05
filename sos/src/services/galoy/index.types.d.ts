@@ -92,3 +92,15 @@ type LN_NO_AMOUNT_INVOICE_CREATE_RESPONSE = {
     }
   }
 }
+
+type BTC_PRICE = {
+  errors
+  data: {
+    btcPrice: {
+      base: number
+      currencyUnit: string
+      formattedAmount: string
+      offset: number
+    }
+  }
+}
