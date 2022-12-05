@@ -1,8 +1,7 @@
-import { StyleSheet, View, Text, Pressable, ScrollView, Button } from "react-native"
+import { View, Pressable, Button } from "react-native"
 import styled from "styled-components/native"
 import { useNavigation } from "@react-navigation/native"
 import { HomeScreenNavigationProp } from "../navigation/types"
-import colors from "../styles/colors"
 import { TextBold, TextLight, TextMedium, TextRegular } from "../styles/typography"
 import MainButton from "../styles/buttons/main-button"
 import { useEffect, useState } from "react"
@@ -15,6 +14,7 @@ import { demoSoS } from "../lib/sos-demo"
 import { StackorSpend } from "../sos"
 import { SQLiteDb } from "../lib/get-db"
 import { toCurrency, toFormattedNumber } from "../lib/utils"
+
 const TAGGED = [
   {
     tag: "Dining",
@@ -39,7 +39,6 @@ const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>()
 
   // State
-  const [currentStateX, setCurrentState] = useState(PRICE_STATES.SPEND)
   const [sosDB, setSoSDB] = useState(null)
   const [sos, setSoS] = useState<StackorSpend>(null)
   const [currentStackPrice, setCurrentStackPrice] = useState<number | null>(0)
@@ -49,6 +48,7 @@ const HomeScreen = () => {
     fiat: number
   } | null>(null)
   const [transactions, setTransactions] = useState<any[]>([])
+  const [assetDisplay, setAssetDisplay] = useState<"sats" | "fiat" | "btc">("sats")
 
   // Effects
   useEffect(() => {
@@ -102,7 +102,6 @@ const HomeScreen = () => {
 
   // Custom hooks
   const priceDiff = currentStackPrice - currentBTCPrice
-  console.log({ currentStackPrice, currentBTCPrice })
   const currentState = priceDiff > 0 ? PRICE_STATES.STACK : PRICE_STATES.SPEND
   const { isSpend, textColor, backgroundColor } = useColors(currentState)
 
@@ -111,26 +110,57 @@ const HomeScreen = () => {
       ? (currentStackPrice / currentBTCPrice - 1) * 100
       : (1 - currentStackPrice / currentBTCPrice) * 100
 
+  const toggleAssetDisplay = () => {
+    switch (assetDisplay) {
+      case "sats":
+        setAssetDisplay("fiat")
+        break
+      case "fiat":
+        setAssetDisplay("btc")
+        break
+      case "btc":
+        setAssetDisplay("sats")
+        break
+    }
+  }
+
+  const renderAssetDisplay = () => {
+    return (
+      <Pressable onPress={toggleAssetDisplay}>
+        <TextLight color={textColor} size={58}>
+          You currently have
+        </TextLight>
+        {assetDisplay === "sats" && (
+          <TextRegular mBottom={20} size={48}>
+            {toFormattedNumber(currentBalances?.sats)} sats
+          </TextRegular>
+        )}
+        {assetDisplay === "btc" && (
+          <TextRegular mBottom={20} size={48}>
+            {currentBalances?.sats / 100000000} BTC
+          </TextRegular>
+        )}
+        {assetDisplay === "fiat" && (
+          <TextRegular mBottom={20} size={48}>
+            US{toCurrency(currentBalances?.fiat)}
+          </TextRegular>
+        )}
+      </Pressable>
+    )
+  }
+
   return (
     <ContainerWithColourIntent
       color={backgroundColor}
       style={{ flex: 1, paddingTop: 60, paddingHorizontal: 12 }}
     >
-      <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+      <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
         <IconButton
           clickHandler={() => navigation.push("Transactions", { transactions })}
           icon={<FontAwesome5 name="list" size={18} color="white" />}
         />
       </View>
-      <TextLight color={textColor} size={58}>
-        You currently have
-      </TextLight>
-      <TextRegular mBottom={20} size={48}>
-        {toFormattedNumber(currentBalances?.sats)} sats
-        {/* {"\n"}${currentBalances?.fiat} USD{"\n"} */}
-        {/* {currentBalances?.sats / 100_000_000} BTC */}
-      </TextRegular>
-
+      {renderAssetDisplay()}
       <TextRegular color={textColor} size={48}>
         {premiumDiscount.toFixed(2)}%
       </TextRegular>
