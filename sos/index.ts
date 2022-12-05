@@ -7,6 +7,7 @@ import {
   payWithAmountLnInvoice,
   receiveLnNoAmount,
   receiveLnWithAmount,
+  fetchBalances,
 } from "./src/app"
 
 // API definition
@@ -15,6 +16,7 @@ export const StackorSpend = (config: {
 }): StackorSpend => {
   return {
     syncTxns: (args) => syncLatestTxns({ ...args, ...config }),
+    fetchBalances: () => fetchBalances(config),
 
     fetchTxns,
     getStackCost,
