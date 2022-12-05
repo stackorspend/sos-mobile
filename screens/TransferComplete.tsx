@@ -5,19 +5,24 @@ import { TextLight, TextRegular, TextSemibold } from "../styles/typography"
 import MainButton from "../styles/buttons/main-button"
 import { useEffect, useState } from "react"
 import { ContainerWithColourIntent } from "../components/reusables"
-import { PRICE_STATES } from "../project-constants"
 import useColors from "../components/custom-hooks/useColors"
 import { TransferCompleteRouteProp } from "../navigation/types"
-import { toFormattedNumber } from "../lib/utils"
+import { toCurrency, toFormattedNumber } from "../lib/utils"
 
 export default function TransferCompleteScreen() {
   const navigation = useNavigation()
   const route = useRoute<TransferCompleteRouteProp>()
 
-  const { sats, type } = route.params
+  const {
+    sats,
+    type,
+    currentStackPrice,
+    currentBTCPrice,
+    premiumDiscount,
+    currentState,
+  } = route.params
 
   // State
-  const [currentState, setCurrentState] = useState(PRICE_STATES.SPEND)
   const [loading, setLoading] = useState(true)
 
   // Custom hooks
@@ -63,12 +68,14 @@ export default function TransferCompleteScreen() {
           to ln@invoice.com via Lightning for $0.01
         </TextRegular>
         <TextSemibold mBottom={60} size={24}>
-          You saved 0.2% on this transaction
+          You saved {premiumDiscount.toFixed(2)}% on this transaction
         </TextSemibold>
         <TextRegular mBottom={10} color={textColor}>
-          Average buying price: US$19,012.43
+          Average buying price: US{toCurrency(currentStackPrice)}
         </TextRegular>
-        <TextRegular color={textColor}>Current buying price: US$31,012.43</TextRegular>
+        <TextRegular color={textColor}>
+          Current buying price: US{toCurrency(currentBTCPrice)}
+        </TextRegular>
       </>
       <BottomActions>
         <MainButton

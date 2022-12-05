@@ -32,8 +32,8 @@ const TAGGED = [
 // - transactions list clean up ✅
 // - toggle for bitcoin's current price
 // - add a way to accept a unique token, store this in localstorage
-// - add splash screen and logon ✅
-// - pass around correct stack/spend state
+// - add splash screen and logo ✅
+// - pass around correct stack/spend state ✅
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>()
@@ -76,7 +76,7 @@ const HomeScreen = () => {
       })
 
     // TODO: implement as sos.getCurrentPrice
-    const getCurrentPrice = async () => 20000
+    const getCurrentPrice = async () => 12000
     getCurrentPrice(db).then((price) => {
       setCurrentBTCPrice(price)
     })
@@ -205,7 +205,15 @@ const HomeScreen = () => {
       <BottomActions>
         <MainButton
           style={{ flex: 1 }}
-          clickHandler={() => navigation.push("Send")}
+          clickHandler={() =>
+            navigation.push("Send", {
+              currentBalances,
+              premiumDiscount,
+              currentState,
+              currentBTCPrice,
+              currentStackPrice,
+            })
+          }
           title="💸 Send Sats"
         />
         <IconButton
@@ -214,7 +222,13 @@ const HomeScreen = () => {
           btnStyle={{ marginHorizontal: 13 }}
         />
         <MainButton
-          clickHandler={() => navigation.push("Receive")}
+          clickHandler={() =>
+            navigation.push("Receive", {
+              currentBTCPrice,
+              currentStackPrice,
+              premiumDiscount,
+            })
+          }
           style={{ flex: 1 }}
           title="Receive"
         />
