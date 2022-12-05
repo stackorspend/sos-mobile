@@ -40,6 +40,8 @@ type ApiTxn = {
     fee: number
     code: string
   }
+  txType: string
+  txHash: string | undefined
   txPrice: number
   stackAvgPrice: number
   gainLoss: string

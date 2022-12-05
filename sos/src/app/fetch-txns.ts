@@ -21,6 +21,8 @@ const mapTxns = (txn): ApiTxn => {
   const { fiat_amount_with_fee: fiatAmountWithFee, fiat_fee: fiatFee } = txn
   const fiatAmount = Number((fiatAmountWithFee - fiatFee).toFixed(4))
 
+  const txType = txn.ln_payment_hash ? "LIGHTNING" : txn.onchain_tx_id ? "ONCHAIN" : ""
+
   return {
     timestamp: txn.timestamp,
     source: txn.source_name,
@@ -37,6 +39,13 @@ const mapTxns = (txn): ApiTxn => {
       fee: fiatFee,
       code: txn.fiat_code,
     },
+    txType,
+    txHash:
+      txType === "LIGHTNING"
+        ? txn.ln_payment_hash
+        : txType === "ONCHAIN"
+        ? txn.onchain_tx_id
+        : undefined,
     txPrice: txn.fiat_per_sat / 10 ** 4,
     stackAvgPrice: txn.stack_price_without_pl,
     gainLoss: txn.fiat_pl_percentage,
