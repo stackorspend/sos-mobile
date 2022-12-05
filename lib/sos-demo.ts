@@ -1,9 +1,6 @@
 import { StackorSpend } from "../sos"
 import { SQLiteDb } from "./get-db"
 
-// TODOS:
-// - ApiTxn.memo
-
 export const demoSoS = async () => {
   console.log("START")
   const db = SQLiteDb()
