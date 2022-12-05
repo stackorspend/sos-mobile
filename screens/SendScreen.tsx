@@ -124,12 +124,13 @@ export default function SendScreen() {
             Balance after:
           </TextBold>
           <TextRegular color={textColor}>
-            {toFormattedNumber(currentBalances.sats - Number(satsToSend))} sats
+            {toFormattedNumber(currentBalances.satsBalance - Number(satsToSend))} sats
           </TextRegular>
           <TextRegular mBottom={20} color={textColor}>
             US
             {toCurrency(
-              currentBalances.fiat - satsToUSD(parseFloat(satsToSend), currentBTCPrice),
+              currentBalances.fiatBalance -
+                satsToUSD(parseFloat(satsToSend), currentBTCPrice),
             )}
           </TextRegular>
           <NoteInput

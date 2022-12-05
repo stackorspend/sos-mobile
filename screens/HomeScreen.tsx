@@ -1,4 +1,4 @@
-import { View, Pressable, Button, TextInput, ActivityIndicator } from "react-native"
+import { View, Pressable, Alert, ActivityIndicator } from "react-native"
 import styled from "styled-components/native"
 import { useNavigation } from "@react-navigation/native"
 import { HomeScreenNavigationProp } from "../navigation/types"
@@ -41,22 +41,23 @@ const TAGGED = [
 // - add a way to accept a unique token, store this in localstorage
 // - add splash screen and logo ✅
 // - pass around correct stack/spend state ✅
+// - add reset button to blow up DB and start fresh
+
+const db = SQLiteDb()
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>()
   const bottomSheetRef = useRef<BottomSheet>(null)
-  const snapPoints = useMemo(() => ["25%"], [])
+  const snapPoints = useMemo(() => ["55%"], [])
 
   // State
-  const [sosDB, setSoSDB] = useState(null)
-  const [sos, setSoS] = useState<StackorSpend>(null)
   const [currentStackPrice, setCurrentStackPrice] = useState<number | null>(0)
   const [currentBTCPrice, setCurrentBTCPrice] = useState<number | null>(0)
   const [currentBalances, setCurrentBalances] = useState<{
-    sats: number
-    fiat: number
-  } | null>(null)
-  const [transactions, setTransactions] = useState<any[]>([])
+    satsBalance: number
+    fiatBalance: number
+  } | null>({ satsBalance: 0, fiatBalance: 0 })
+  const [transactions, setTransactions] = useState<ApiTxn[]>([])
   const [assetDisplay, setAssetDisplay] = useState<"sats" | "fiat" | "btc">("sats")
   const [galoyToken, setGaloyToken] = useState<string | null>(
     "nWL9JckgHA6uMjwuz6kkYrAowrpNXSas",
@@ -65,53 +66,56 @@ const HomeScreen = () => {
 
   // Effects
   useEffect(() => {
-    const db = SQLiteDb()
-
+    console.log({ galoyToken })
+    if (!galoyToken) return
     const sos = StackorSpend({
       galoy: {
         endpoint: "https://api.staging.galoy.io/graphql/",
         token: galoyToken,
       },
     })
-    setSoS(sos)
-    setSoSDB(db)
 
-    sos
-      .getStackCost(db)
-      .then((cost) => {
-        if (cost instanceof Error) throw cost
-        setCurrentStackPrice(cost)
-      })
-      .catch((err) => {
-        console.log("Error getting stack cost", err)
-        setCurrentStackPrice(16000)
-      })
-
-    // TODO: implement as sos.getCurrentPrice
-    const getCurrentPrice = async () => 12000
-    getCurrentPrice(db).then((price) => {
-      setCurrentBTCPrice(price)
-    })
-
-    // // TODO: implement as sos.getCurrentPrice
-    const getBalances = async () => {
-      return { sats: 100000, fiat: 12.34 }
+    const getStackCost = async () => {
+      const cost = await sos.getStackCost(db)
+      if (cost instanceof Error) throw cost
+      setCurrentStackPrice(cost)
     }
-    getBalances(db).then((balances) => {
-      setCurrentBalances(balances)
+
+    const getBalancesAndCurrentPrice = async () => {
+      const balances = await sos.fetchBalances()
+      const price = await sos.getCurrentPrice()
+      if (balances instanceof Error) throw balances
+      if (price instanceof Error) throw price
+      const fiatBalance = (balances.satsBalance / 100000000) * price.usdPerBtc
+      setCurrentBalances({ ...balances, fiatBalance })
+      setCurrentBTCPrice(price.usdPerBtc)
+    }
+
+    const fetchTransactions = async () => {
+      const obj = await sos.fetchTxns({ db, first: 20 })
+      if (obj instanceof Error) {
+        throw obj
+      }
+      const { cursor, txns } = obj
+      setTransactions(txns)
+    }
+
+    fetchTransactions().catch((err) => {
+      console.log("Error fetching transactions", err.message)
     })
 
-    sos
-      .fetchTxns({ db, first: 20 })
-      .then((obj) => {
-        if (obj instanceof Error) throw obj
-        const { cursor, txns } = obj
-        setTransactions(txns)
+    getStackCost().catch((err) => {
+      console.log("Error getting stack cost", err.message)
+    })
+
+    getBalancesAndCurrentPrice()
+      .then(() => {
+        setInitializing(false)
       })
       .catch((err) => {
-        console.log(err.message)
+        console.log("Error fetching balances and current price", err.message)
       })
-  }, [])
+  }, [galoyToken])
 
   const renderBackdrop = useCallback(
     (props) => (
@@ -124,6 +128,77 @@ const HomeScreen = () => {
     ),
     [],
   )
+
+  const rebuildDB = async () => {
+    setInitializing(true)
+    const sos = StackorSpend({
+      galoy: {
+        endpoint: "https://api.staging.galoy.io/graphql/",
+        token: galoyToken,
+      },
+    })
+    await sos
+      .syncTxns({
+        db,
+        pageSize: 100,
+        rebuild: true,
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    setInitializing(false)
+  }
+
+  const resetState = () => {
+    // Reset State
+    setCurrentStackPrice(0)
+    setCurrentBTCPrice(0)
+    setCurrentBalances({ satsBalance: 0, fiatBalance: 0 })
+    setTransactions([])
+    setAssetDisplay("sats")
+    setGaloyToken(null)
+  }
+
+  const confirmClearAppState = () => {
+    Alert.alert(
+      "Are you sure?",
+      "This will completely clear the app's current state and your active token.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Confirm",
+          style: "default",
+          onPress: () => clearAppState(),
+        },
+      ],
+    )
+  }
+
+  const clearAppState = async () => {
+    setInitializing(true)
+    const sos = StackorSpend({
+      galoy: {
+        endpoint: "https://api.staging.galoy.io/graphql/",
+        token: galoyToken,
+      },
+    })
+    // TODO: drop DB
+    await sos
+      .syncTxns({
+        db,
+        pageSize: 100,
+        rebuild: true,
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+
+    resetState()
+    setInitializing(false)
+  }
 
   // Custom hooks
   const priceDiff = currentStackPrice - currentBTCPrice
@@ -152,22 +227,42 @@ const HomeScreen = () => {
   const renderAssetDisplay = () => {
     return (
       <Pressable onPress={toggleAssetDisplay}>
-        <TextLight color={textColor} size={54}>
+        <TextLight
+          adjustsFontSizeToFit={true}
+          numberOfLines={1}
+          color={textColor}
+          size={54}
+        >
           You currently have
         </TextLight>
         {assetDisplay === "sats" && (
-          <TextRegular mBottom={20} size={48}>
-            {toFormattedNumber(currentBalances?.sats)} sats
+          <TextRegular
+            adjustsFontSizeToFit={true}
+            numberOfLines={1}
+            mBottom={20}
+            size={48}
+          >
+            {toFormattedNumber(currentBalances?.satsBalance)} sats
           </TextRegular>
         )}
         {assetDisplay === "btc" && (
-          <TextRegular mBottom={20} size={48}>
-            {currentBalances?.sats / 100000000} BTC
+          <TextRegular
+            adjustsFontSizeToFit={true}
+            numberOfLines={1}
+            mBottom={20}
+            size={48}
+          >
+            {currentBalances?.satsBalance / 100000000} BTC
           </TextRegular>
         )}
         {assetDisplay === "fiat" && (
-          <TextRegular mBottom={20} size={48}>
-            US{toCurrency(currentBalances?.fiat)}
+          <TextRegular
+            adjustsFontSizeToFit={true}
+            numberOfLines={1}
+            mBottom={20}
+            size={48}
+          >
+            US{toCurrency(currentBalances?.fiatBalance)}
           </TextRegular>
         )}
       </Pressable>
@@ -178,17 +273,17 @@ const HomeScreen = () => {
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
 
-  // if (initializing) {
-  //   return (
-  //     <ContainerWithColourIntent
-  //       color="white"
-  //       style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-  //     >
-  //       <ActivityIndicator size="large" />
-  //       <TextRegular>Just a moment</TextRegular>
-  //     </ContainerWithColourIntent>
-  //   )
-  // }
+  if (initializing) {
+    return (
+      <ContainerWithColourIntent
+        color={backgroundColor}
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <ActivityIndicator size="large" />
+        <TextRegular>Just a moment</TextRegular>
+      </ContainerWithColourIntent>
+    )
+  }
 
   return (
     <ContainerWithColourIntent
@@ -203,9 +298,9 @@ const HomeScreen = () => {
       </View>
       {renderAssetDisplay()}
       <TextRegular color={textColor} size={48}>
-        {premiumDiscount.toFixed(2)}%
+        {(isNaN(premiumDiscount) ? 0 : premiumDiscount).toFixed(2)}%
       </TextRegular>
-      <TextRegular color={textColor} mBottom={40}>
+      <TextRegular color={textColor} mBottom={20}>
         will be saved on your next {isSpend ? "spend" : "stack"}
       </TextRegular>
       <TextMedium color={textColor} mBottom={40} size={16}>
@@ -300,6 +395,12 @@ const HomeScreen = () => {
             blurOnSubmit={true}
             keyboardType="text"
           />
+          <MainButton
+            title="Change Token"
+            clickHandler={() => bottomSheetRef?.current.close()}
+          />
+          <MainButton title="Rebuild Database" clickHandler={rebuildDB} />
+          <MainButton title="Clear App State" clickHandler={confirmClearAppState} />
         </View>
       </BottomSheet>
     </ContainerWithColourIntent>
