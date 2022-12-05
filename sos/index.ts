@@ -8,6 +8,7 @@ import {
   receiveLnNoAmount,
   receiveLnWithAmount,
   fetchBalances,
+  clearTxData,
 } from "./src/app"
 
 // API definition
@@ -16,6 +17,7 @@ export const StackorSpend = (config: {
 }): StackorSpend => {
   return {
     syncTxns: (args) => syncLatestTxns({ ...args, ...config }),
+    clearTxData,
     fetchBalances: () => fetchBalances(config),
 
     fetchTxns,

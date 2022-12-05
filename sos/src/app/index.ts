@@ -1,5 +1,6 @@
 export * from "./fetch-txns"
 export * from "./fetch-balances"
+export * from "./clear-tx-data"
 export * from "./sync-txns"
 export * from "./get-stack-cost"
 export * from "./get-current-price"

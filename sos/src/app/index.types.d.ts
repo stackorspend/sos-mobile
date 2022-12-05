@@ -88,6 +88,7 @@ type ReceiveLnResult = Promise<
 
 type StackorSpend = {
   syncTxns: (args: SyncTxnsArgs) => Promise<true | Error>
+  clearTxData: (db: Db) => Promise<true | Error>
   fetchBalances: () => FetchBalancesResult
 
   fetchTxns: (args: FetchTxnsArgs) => FetchTxnsResult
