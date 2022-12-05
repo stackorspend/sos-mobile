@@ -28,13 +28,6 @@ const Button = styled.View`
   align-items: center;
   justify-content: center;
 `
-const Text = styled.Text`
-  color: ${(props) => (props.primary || props.white ? colors.copy : "white")};
-  /* color: white; */
-  font-size: 14px;
-  font-weight: 500;
-  padding: 0 18px;
-`
 
 const IconButton = ({
   clickHandler,

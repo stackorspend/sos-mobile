@@ -31,7 +31,7 @@ const Button = styled.View`
 const Text = styled.Text`
   color: ${(props) => (props.secondary ? colors.copy : "white")};
   /* color: white; */
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   padding: 0 18px;
 `

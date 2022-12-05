@@ -8,6 +8,7 @@ import { ContainerWithColourIntent } from "../components/reusables"
 import { PRICE_STATES } from "../project-constants"
 import useColors from "../components/custom-hooks/useColors"
 import { TransferCompleteRouteProp } from "../navigation/types"
+import { toFormattedNumber } from "../lib/utils"
 
 export default function TransferCompleteScreen() {
   const navigation = useNavigation()
@@ -56,7 +57,7 @@ export default function TransferCompleteScreen() {
           You {type === "receive" ? "received" : "sent"}
         </TextRegular>
         <TextSemibold mBottom={8} size={28}>
-          {sats} sats
+          {toFormattedNumber(sats)} sats
         </TextSemibold>
         <TextRegular mBottom={30} color={textColor}>
           to ln@invoice.com via Lightning for $0.01
