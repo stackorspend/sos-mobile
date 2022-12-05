@@ -48,6 +48,18 @@ const MainButton = ({
   title,
   white,
   btnStyle,
+}: {
+  clickHandler: () => void
+  disabled?: boolean
+  icon?: React.ReactNode
+  loading?: boolean
+  primary?: boolean
+  secondary?: boolean
+  small?: boolean
+  style?: any
+  title: string
+  white?: boolean
+  btnStyle?: any
 }) => (
   <TouchableOpacity
     style={{ marginBottom: 10, ...style }}

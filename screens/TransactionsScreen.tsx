@@ -104,7 +104,7 @@ export default function TransactionsScreen() {
 
             <DetailHeading>Type</DetailHeading>
             <TextRegular mBottom={25}>
-              {selectedTransaction?.transactionType === "lightning"
+              {selectedTransaction?.txType === "LIGHTNING"
                 ? "Lightning Payment"
                 : "On-chain Payment"}
             </TextRegular>
@@ -162,7 +162,7 @@ const TransactionItem = ({ item }: { item: ApiTxn }) => (
       )}
     </View>
     <View style={{ flexDirection: "row", alignItems: "center" }}>
-      {/* {item.transactionType === "bitcoin" ? (
+      {item.txType === "BITCOIN" ? (
         <FontAwesome5
           style={{ marginRight: 8 }}
           name="bitcoin"
@@ -176,13 +176,7 @@ const TransactionItem = ({ item }: { item: ApiTxn }) => (
           size={24}
           color="#E7B416"
         />
-      )} */}
-      <MaterialCommunityIcons
-        style={{ marginRight: 8 }}
-        name="lightning-bolt-circle"
-        size={24}
-        color="#E7B416"
-      />
+      )}
       <View>
         <TextRegular size={14} color="#939393">
           {new Date(item.timestamp).toLocaleString("en-GB", {

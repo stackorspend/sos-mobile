@@ -8,8 +8,6 @@ const Button = styled.View`
   background: ${(props) =>
     props.disabled
       ? colors.disabled
-      : props.white
-      ? props.background
       : props.background
       ? "white"
       : props.primary
@@ -38,8 +36,17 @@ const IconButton = ({
   secondary,
   small,
   style,
-  white,
   btnStyle,
+}: {
+  clickHandler: () => void
+  disabled?: boolean
+  icon: React.ReactNode
+  loading?: boolean
+  primary?: boolean
+  secondary?: boolean
+  small?: boolean
+  style?: any
+  btnStyle?: any
 }) => (
   <TouchableOpacity
     style={{ marginBottom: 10, ...style }}
@@ -53,7 +60,6 @@ const IconButton = ({
       disabled={disabled || loading}
       small={small}
       secondary={secondary}
-      white={white}
       primary={primary}
       style={{ ...btnStyle }}
     >
