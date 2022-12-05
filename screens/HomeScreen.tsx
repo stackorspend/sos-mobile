@@ -68,18 +68,18 @@ const HomeScreen = () => {
       })
       .catch((err) => {
         console.log("Error getting stack cost", err)
-        setCurrentStackPrice(16_000)
+        setCurrentStackPrice(16000)
       })
 
     // TODO: implement as sos.getCurrentPrice
-    const getCurrentPrice = async () => 14_000
+    const getCurrentPrice = async () => 14000
     getCurrentPrice(db).then((price) => {
       setCurrentBTCPrice(price)
     })
 
     // // TODO: implement as sos.getCurrentPrice
     const getBalances = async () => {
-      return { sats: 100_000, fiat: 12.34 }
+      return { sats: 100000, fiat: 12.34 }
     }
     getBalances(db).then((balances) => {
       setCurrentBalances(balances)
