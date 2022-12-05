@@ -63,6 +63,6 @@ export const demoSoS = async () => {
     const { satsBalance } = balances
     const fiatBalance = (satsBalance / 100_000_000) * usdPerBtc
     console.log("Current sats balance is:", satsBalance)
-    console.log("Current sats balance is:", fiatBalance)
+    console.log("Current fiat balance is:", fiatBalance)
   }
 }

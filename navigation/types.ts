@@ -7,8 +7,8 @@ export type HomeStackNavigatorParamList = {
   Send: {
     currentState: string
     currentBalances: {
-      sats: number
-      fiat: number
+      satsBalance: number
+      fiatBalance: number
     }
     premiumDiscount: number
     currentBTCPrice: number

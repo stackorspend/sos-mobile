@@ -1,4 +1,4 @@
-import { FlatList, Pressable, SafeAreaView, View } from "react-native"
+import { FlatList, Platform, Pressable, SafeAreaView, View } from "react-native"
 import { TextMedium, TextRegular, TextSemibold } from "../styles/typography"
 import styled from "styled-components"
 import { Feather } from "@expo/vector-icons"
@@ -18,8 +18,6 @@ const DetailHeading = styled(TextMedium)`
 export default function TransactionsScreen() {
   const route = useRoute<TransactionsRouteProp>()
   const { transactions } = route.params
-
-  console.log({ transactions })
 
   const bottomSheetRef = useRef<BottomSheet>(null)
   const snapPoints = useMemo(() => ["90%"], [])
@@ -49,7 +47,14 @@ export default function TransactionsScreen() {
   )
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <View style={{ flex: 1, paddingTop: 30, padding: 12, backgroundColor: "white" }}>
+      <View
+        style={{
+          flex: 1,
+          paddingTop: Platform.OS === "android" ? 80 : 30,
+          padding: 12,
+          backgroundColor: "white",
+        }}
+      >
         <TextRegular mBottom={30} size={40}>
           Transactions
         </TextRegular>
@@ -57,6 +62,11 @@ export default function TransactionsScreen() {
           data={transactions}
           renderItem={renderItem}
           keyExtractor={(item, index) => index + item.sourceId}
+          ListEmptyComponent={
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <TextRegular>No transactions yet..</TextRegular>
+            </View>
+          }
         />
         <BottomSheet
           ref={bottomSheetRef}
