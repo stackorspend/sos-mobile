@@ -65,4 +65,10 @@ export const demoSoS = async () => {
     console.log("Current sats balance is:", satsBalance)
     console.log("Current fiat balance is:", fiatBalance)
   }
+
+  // ==========
+  // Step 6: Delete data
+  // ==========
+  const step6 = false
+  if (step6) await sos.clearTxData(db)
 }
