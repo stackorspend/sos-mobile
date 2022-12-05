@@ -60,9 +60,16 @@ const HomeScreen = () => {
     setSoS(sos)
     setSoSDB(db)
 
-    sos.getStackCost(db).then((cost) => {
-      setCurrentStackPrice(cost)
-    })
+    sos
+      .getStackCost(db)
+      .then((cost) => {
+        if (cost instanceof Error) throw cost
+        setCurrentStackPrice(cost)
+      })
+      .catch((err) => {
+        console.log("Error getting stack cost", err)
+        setCurrentStackPrice(16_000)
+      })
 
     // TODO: implement as sos.getCurrentPrice
     const getCurrentPrice = async () => 14_000
@@ -70,7 +77,7 @@ const HomeScreen = () => {
       setCurrentBTCPrice(price)
     })
 
-    // TODO: implement as sos.getCurrentPrice
+    // // TODO: implement as sos.getCurrentPrice
     const getBalances = async () => {
       return { sats: 100_000, fiat: 12.34 }
     }
@@ -78,15 +85,21 @@ const HomeScreen = () => {
       setCurrentBalances(balances)
     })
 
-    sos.fetchTxns({ db, first: 20 }).then((obj) => {
-      if (obj instanceof Error) throw obj
-      const { cursor, txns } = obj
-      setTransactions(txns)
-    })
+    sos
+      .fetchTxns({ db, first: 20 })
+      .then((obj) => {
+        if (obj instanceof Error) throw obj
+        const { cursor, txns } = obj
+        setTransactions(txns)
+      })
+      .catch((err) => {
+        console.log(err.message)
+      })
   }, [])
 
   // Custom hooks
   const priceDiff = currentStackPrice - currentBTCPrice
+  console.log({ currentStackPrice, currentBTCPrice })
   const currentState = priceDiff > 0 ? PRICE_STATES.STACK : PRICE_STATES.SPEND
   const { isSpend, textColor, backgroundColor } = useColors(currentState)
 
@@ -112,12 +125,12 @@ const HomeScreen = () => {
       <TextRegular mBottom={20} size={48}>
         {currentBalances?.sats} sats
         {/* {"\n"}${currentBalances?.fiat} USD{"\n"} */}
-        {/* {currentBalances.sats / 100_000_000} BTC */}
+        {/* {currentBalances?.sats / 100_000_000} BTC */}
       </TextRegular>
 
-      <TextRegular mBottom={40} size={16}>
+      {/* <TextRegular mBottom={40} size={16}>
         Stack price: {currentStackPrice}
-      </TextRegular>
+      </TextRegular> */}
       <TextRegular color={textColor} size={48}>
         {premiumDiscount.toFixed(2)}%
       </TextRegular>
