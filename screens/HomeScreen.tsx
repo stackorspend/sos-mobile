@@ -1,4 +1,4 @@
-import { View, Pressable, Button, TextInput } from "react-native"
+import { View, Pressable, Button, TextInput, ActivityIndicator } from "react-native"
 import styled from "styled-components/native"
 import { useNavigation } from "@react-navigation/native"
 import { HomeScreenNavigationProp } from "../navigation/types"
@@ -37,7 +37,7 @@ const TAGGED = [
 // - Stack price ✅
 // - tappable toggle for price ✅
 // - transactions list clean up ✅
-// - toggle for bitcoin's current price
+// - toggle for bitcoin's current price ✅
 // - add a way to accept a unique token, store this in localstorage
 // - add splash screen and logo ✅
 // - pass around correct stack/spend state ✅
@@ -61,6 +61,7 @@ const HomeScreen = () => {
   const [galoyToken, setGaloyToken] = useState<string | null>(
     "nWL9JckgHA6uMjwuz6kkYrAowrpNXSas",
   )
+  const [initializing, setInitializing] = useState(true)
 
   // Effects
   useEffect(() => {
@@ -176,6 +177,18 @@ const HomeScreen = () => {
   const randomIntFromInterval = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
+
+  // if (initializing) {
+  //   return (
+  //     <ContainerWithColourIntent
+  //       color="white"
+  //       style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+  //     >
+  //       <ActivityIndicator size="large" />
+  //       <TextRegular>Just a moment</TextRegular>
+  //     </ContainerWithColourIntent>
+  //   )
+  // }
 
   return (
     <ContainerWithColourIntent
