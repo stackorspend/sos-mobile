@@ -11,7 +11,7 @@ import useColors from "../components/custom-hooks/useColors"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import IconButton from "../styles/buttons/icon-button"
 import { Octicons } from "@expo/vector-icons"
-import { satsToUSD } from "../lib/utils"
+import { satsToUSD, toCurrency, toFormattedNumber } from "../lib/utils"
 import { SendScreenNavigationProp } from "../navigation/types"
 
 const TAGS = ["Dining", "Health", "Groceries", "Dining"]
@@ -106,14 +106,14 @@ export default function SendScreen() {
       {currentScreenState === STATES.ENTER_INFORMATION && (
         <>
           <TextRegular mBottom={10} size={24} color={textColor}>
-            $US{satsToUSD(parseFloat(satsToSend), 16971.09).toFixed(2)}
+            US{toCurrency(satsToUSD(parseFloat(satsToSend), 16971.09))}
           </TextRegular>
           <TextBold mBottom={4} color={textColor}>
             Balance after:
           </TextBold>
-          <TextRegular color={textColor}>18923451 sats </TextRegular>
+          <TextRegular color={textColor}>{toFormattedNumber(18923451)} sats</TextRegular>
           <TextRegular mBottom={20} color={textColor}>
-            US$2,000
+            US{toCurrency(2000)}
           </TextRegular>
           <NoteInput
             placeholder="📝 Add note"
@@ -158,7 +158,7 @@ export default function SendScreen() {
       {currentScreenState === STATES.CONFIRM && (
         <>
           <TextSemibold size={28} mBottom={10} style={{ marginTop: 50 }}>
-            {satsToSend} sats
+            {toFormattedNumber(satsToSend)} sats
           </TextSemibold>
           <TextRegular mBottom={60} color={textColor}>
             to ln@invoice.com via Lightning for $0.01

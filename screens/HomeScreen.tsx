@@ -3,7 +3,7 @@ import styled from "styled-components/native"
 import { useNavigation } from "@react-navigation/native"
 import { HomeScreenNavigationProp } from "../navigation/types"
 import colors from "../styles/colors"
-import { TextBold, TextLight, TextRegular } from "../styles/typography"
+import { TextBold, TextLight, TextMedium, TextRegular } from "../styles/typography"
 import MainButton from "../styles/buttons/main-button"
 import { useEffect, useState } from "react"
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons"
@@ -14,6 +14,7 @@ import useColors from "../components/custom-hooks/useColors"
 import { demoSoS } from "../lib/sos-demo"
 import { StackorSpend } from "../sos"
 import { SQLiteDb } from "../lib/get-db"
+import { toCurrency, toFormattedNumber } from "../lib/utils"
 const TAGGED = [
   {
     tag: "Dining",
@@ -25,12 +26,14 @@ const TAGGED = [
 ]
 
 // TODO:
-// - Number formatting
-// - Stack price
+// - Number formatting ✅
+// - Stack price ✅
 // - tappable toggle for price
 // - transactions list clean up
 // - toggle for bitcoin's current price
 // - add a way to accept a unique token
+// - add splash screen and logo
+// - pass around correct stack/spend state
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>()
@@ -111,9 +114,9 @@ const HomeScreen = () => {
   return (
     <ContainerWithColourIntent
       color={backgroundColor}
-      style={{ flex: 1, paddingTop: 70, paddingHorizontal: 12 }}
+      style={{ flex: 1, paddingTop: 60, paddingHorizontal: 12 }}
     >
-      <View style={{ flexDirection: " row", alignItems: "flex-end" }}>
+      <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
         <IconButton
           clickHandler={() => navigation.push("Transactions", { transactions })}
           icon={<FontAwesome5 name="list" size={18} color="white" />}
@@ -123,20 +126,20 @@ const HomeScreen = () => {
         You currently have
       </TextLight>
       <TextRegular mBottom={20} size={48}>
-        {currentBalances?.sats} sats
+        {toFormattedNumber(currentBalances?.sats)} sats
         {/* {"\n"}${currentBalances?.fiat} USD{"\n"} */}
         {/* {currentBalances?.sats / 100_000_000} BTC */}
       </TextRegular>
 
-      {/* <TextRegular mBottom={40} size={16}>
-        Stack price: {currentStackPrice}
-      </TextRegular> */}
       <TextRegular color={textColor} size={48}>
         {premiumDiscount.toFixed(2)}%
       </TextRegular>
       <TextRegular color={textColor} mBottom={40}>
         will be saved on your next {isSpend ? "spend" : "stack"}
       </TextRegular>
+      <TextMedium color={textColor} mBottom={40} size={16}>
+        Your average stack price: US{toCurrency(currentStackPrice)}
+      </TextMedium>
 
       {/* <Button
         onPress={() => {
