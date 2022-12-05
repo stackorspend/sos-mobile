@@ -59,21 +59,26 @@ export default function SendScreen() {
       style={{ flex: 1, paddingTop: 120, paddingHorizontal: 12 }}
     >
       <TextLight mBottom={20} color={textColor} size={58}>
-        Send
+        Receive
       </TextLight>
       {/* Hide sats/invoice input when the user is on the confirmation step */}
       {currentScreenState !== STATES.CONFIRM && (
-        <Input
-          style={{ fontSize: satsToSend.length > 0 ? 48 : 16 }}
-          placeholder="Enter the amount of sats to send"
-          // placeholder="Enter invoice, LNURL, or on-chain address here"
-          placeholderTextColor={textColor}
-          onChangeText={(text) => setSatsAmount(text)}
-          defaultValue={satsToSend}
-          returnKeyType="done"
-          blurOnSubmit={true}
-          keyboardType="numeric"
-        />
+        <Actions>
+          <Input
+            style={{ width: "85%", fontSize: satsToSend.length > 0 ? 48 : 16 }}
+            placeholder="Sats you'd like to receive"
+            // placeholder="Enter invoice, LNURL, or on-chain address here"
+            placeholderTextColor={textColor}
+            onChangeText={(text) => setSatsAmount(text)}
+            defaultValue={satsToSend}
+            returnKeyType="done"
+            blurOnSubmit={true}
+            keyboardType="numeric"
+          />
+          <TextLight mBottom={20} color={textColor} size={30}>
+            sats
+          </TextLight>
+        </Actions>
       )}
       {currentScreenState === STATES.INVOICE && (
         <>

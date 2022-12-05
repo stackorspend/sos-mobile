@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import HomeScreen from "../screens/HomeScreen"
 import { HomeStackNavigatorParamList } from "./types"
 import SendScreen from "../screens/SendScreen"
+import ReceiveScreen from "../screens/ReceiveScreen"
 import TransferCompleteScreen from "../screens/TransferComplete"
 
 const HomeStack = createNativeStackNavigator<HomeStackNavigatorParamList>()
@@ -19,6 +20,18 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen
         name="Send"
         component={SendScreen}
+        options={{
+          headerShown: true,
+          // headerBackTitleVisible: false,
+          headerTitle: "",
+          headerShadowVisible: false,
+          headerTransparent: true,
+          headerTintColor: "black",
+        }}
+      />
+      <HomeStack.Screen
+        name="Receive"
+        component={ReceiveScreen}
         options={{
           headerShown: true,
           // headerBackTitleVisible: false,

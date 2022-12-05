@@ -5,6 +5,7 @@ import type { RouteProp } from "@react-navigation/native"
 export type HomeStackNavigatorParamList = {
   Home: undefined
   Send: undefined
+  Receive: undefined
   TransferComplete: {
     sats: number
   }

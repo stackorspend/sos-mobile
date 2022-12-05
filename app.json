@@ -2,7 +2,6 @@
   "expo": {
     "name": "sos-mobile",
     "slug": "sos-mobile",
-    "runtimeVersion": "1.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

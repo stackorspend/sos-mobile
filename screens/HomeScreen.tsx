@@ -85,16 +85,39 @@ const HomeScreen = () => {
           style={{ flex: 1 }}
           clickHandler={() => navigation.push("Send")}
           title="💸 Send Sats"
+          disabled={undefined}
+          icon={undefined}
+          loading={undefined}
+          primary={undefined}
+          secondary={undefined}
+          small={undefined}
+          white={undefined}
+          btnStyle={undefined}
         />
         <IconButton
           clickHandler={() => alert("TODO: Open Camera")}
           icon={<FontAwesome name="camera" size={16} color="white" />}
           btnStyle={{ marginHorizontal: 13 }}
+          disabled={undefined}
+          loading={undefined}
+          primary={undefined}
+          secondary={undefined}
+          small={undefined}
+          style={undefined}
+          white={undefined}
         />
         <MainButton
-          clickHandler={() => alert("TODO: Receive flow")}
+          clickHandler={() => navigation.push("Receive")}
           style={{ flex: 1 }}
           title="Receive"
+          disabled={undefined}
+          icon={undefined}
+          loading={undefined}
+          primary={undefined}
+          secondary={undefined}
+          small={undefined}
+          white={undefined}
+          btnStyle={undefined}
         />
       </BottomActions>
     </ContainerWithColourIntent>
