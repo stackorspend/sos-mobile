@@ -29,7 +29,7 @@ const TAGGED = [
 // - Number formatting ✅
 // - Stack price ✅
 // - tappable toggle for price ✅
-// - transactions list clean up
+// - transactions list clean up ✅
 // - toggle for bitcoin's current price
 // - add a way to accept a unique token, store this in localstorage
 // - add splash screen and logon ✅
@@ -76,7 +76,7 @@ const HomeScreen = () => {
       })
 
     // TODO: implement as sos.getCurrentPrice
-    const getCurrentPrice = async () => 14000
+    const getCurrentPrice = async () => 20000
     getCurrentPrice(db).then((price) => {
       setCurrentBTCPrice(price)
     })

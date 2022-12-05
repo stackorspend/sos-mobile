@@ -5,28 +5,9 @@ import { Feather } from "@expo/vector-icons"
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons"
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet"
 import { useCallback, useMemo, useRef, useState } from "react"
-import { satsToUSD } from "../lib/utils"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { satsToUSD, toCurrency, toFormattedNumber } from "../lib/utils"
+import { useRoute } from "@react-navigation/native"
 import { TransactionsRouteProp } from "../navigation/types"
-
-const DATA = [
-  {
-    id: 1,
-    date: "Jan 30, 2022",
-    name: "John Doe",
-    type: "send",
-    sats: 200,
-    transactionType: "lightning",
-  },
-  {
-    id: 2,
-    date: "Jan 30, 2022",
-    name: "Jane Doe",
-    type: "receive",
-    sats: 200,
-    transactionType: "bitcoin",
-  },
-]
 
 const DetailHeading = styled(TextMedium)`
   color: #8d8d8d;
@@ -43,7 +24,7 @@ export default function TransactionsScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null)
   const snapPoints = useMemo(() => ["90%"], [])
 
-  const [selectedTransaction, setSelectedTransaction] = useState<TransactionProps>(null)
+  const [selectedTransaction, setSelectedTransaction] = useState<ApiTxn>(null)
 
   const renderItem = ({ item }) => (
     <Pressable
@@ -75,7 +56,7 @@ export default function TransactionsScreen() {
         <FlatList
           data={transactions}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => index + item.sourceId}
         />
         <BottomSheet
           ref={bottomSheetRef}
@@ -89,15 +70,26 @@ export default function TransactionsScreen() {
               Transaction Details
             </TextSemibold>
             <DetailHeading>Time</DetailHeading>
-            <TextRegular mBottom={25}>{selectedTransaction?.date}</TextRegular>
+            <TextRegular mBottom={25}>
+              {new Date(selectedTransaction?.timestamp).toLocaleString("en-US", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+              })}
+            </TextRegular>
 
             <DetailHeading>Amount (sats)</DetailHeading>
-            <TextRegular mBottom={25}>{selectedTransaction?.sats}</TextRegular>
+            <TextRegular mBottom={25}>
+              {toFormattedNumber(Math.abs(selectedTransaction?.sats.amountWithFee))}
+            </TextRegular>
 
             <DetailHeading>Fiat</DetailHeading>
             {/* TODO: Use Bitcoin's current price */}
             <TextRegular mBottom={25}>
-              about {satsToUSD(selectedTransaction?.sats, 17000)}
+              about{" "}
+              {toCurrency(satsToUSD(selectedTransaction?.sats.amountWithFee, 17000))}
             </TextRegular>
 
             <DetailHeading>Type</DetailHeading>
@@ -108,11 +100,14 @@ export default function TransactionsScreen() {
             </TextRegular>
 
             <DetailHeading>Status</DetailHeading>
-            {/* <TextRegular mBottom={25}>Saturday, November 12, 2022 12:53 AM</TextRegular> */}
+            <TextRegular color="#6AD3BA" mBottom={25}>
+              Paid
+            </TextRegular>
 
             <DetailHeading>Total Fees (sats)</DetailHeading>
-            {/* <TextRegular mBottom={25}>Saturday, November 12, 2022 12:53 AM</TextRegular> */}
-
+            <TextRegular mBottom={25}>
+              {toFormattedNumber(Math.abs(selectedTransaction?.sats.fee))}
+            </TextRegular>
             <DetailHeading>Invoice</DetailHeading>
             {/* <TextRegular mBottom={25}>Saturday, November 12, 2022 12:53 AM</TextRegular> */}
           </View>
@@ -180,13 +175,19 @@ const TransactionItem = ({ item }: { item: ApiTxn }) => (
       />
       <View>
         <TextRegular size={14} color="#939393">
-          {item.timestamp}
+          {new Date(item.timestamp).toLocaleString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+          })}
         </TextRegular>
         <TextRegular size={16}>{item.source}</TextRegular>
       </View>
     </View>
     <View>
-      <TextSemibold>{item.sats.amountWithFee} sats 💸</TextSemibold>
+      <TextSemibold>{Math.abs(item.sats.amountWithFee)} sats 💸</TextSemibold>
     </View>
   </View>
 )
