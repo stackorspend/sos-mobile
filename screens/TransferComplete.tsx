@@ -90,6 +90,7 @@ export default function TransferCompleteScreen() {
         />
         <MainButton
           title="View Invoice"
+          clickHandler={() => alert("TODO: View invoice")}
           secondary
           style={{
             flex: 1,
