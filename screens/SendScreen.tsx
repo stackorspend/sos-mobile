@@ -106,11 +106,13 @@ export default function SendScreen() {
               title="Scan"
               icon={<MaterialCommunityIcons name="line-scan" size={24} color="white" />}
               small
+              clickHandler={() => {}}
             />
             <IconButton
               btnStyle={{ backgroundColor: textColor }}
               small
               icon={<Octicons name="paste" size={18} color="white" />}
+              clickHandler={() => {}}
             />
           </Actions>
         </>

@@ -9,6 +9,15 @@ export const storeAsyncStorageData = async (key, value) => {
   }
 }
 
+export const removeAsyncStorageData = async (key) => {
+  try {
+    await await AsyncStorage.getItem(key)
+  } catch (e) {
+    // saving error
+    console.log("Error saving to async storage", e)
+  }
+}
+
 export const getAsyncStorageData = async (key) => {
   try {
     const value = await AsyncStorage.getItem(key)
