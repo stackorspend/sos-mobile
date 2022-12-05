@@ -12,13 +12,16 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "extra": {
+      "eas": {
+        "projectId": "45ca335e-d5fe-4ecc-8968-d8167c1063e0"
+      }
+    },
     "updates": {
       "fallbackToCacheTimeout": 30000,
       "url": "https://u.expo.dev/45ca335e-d5fe-4ecc-8968-d8167c1063e0"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.stackorspend.sosmobile"
