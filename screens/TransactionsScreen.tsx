@@ -178,10 +178,10 @@ const TransactionItem = ({ item }: { item: ApiTxn }) => (
       )}
       <View>
         <TextRegular size={11} color="#939393" numberOfLines={1}>
-          {new Date(item.timestamp).toLocaleString("en-GB", {
+          {new Date(item.timestamp).toLocaleString("en-US", {
             day: "numeric",
             month: "short",
-            year: "numeric",
+            year: "2-digit",
             hour: "numeric",
             minute: "2-digit",
           })}
@@ -196,7 +196,7 @@ const TransactionItem = ({ item }: { item: ApiTxn }) => (
         numberOfLines={1}
         size={14}
       >
-        {toFormattedNumber(Math.abs(item.sats.amountWithFee))} sats 💸
+        {toFormattedNumber(item.sats.amountWithFee)} sats
       </TextSemibold>
     </View>
   </View>

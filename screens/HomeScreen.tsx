@@ -406,13 +406,25 @@ const HomeScreen = () => {
         hitSlop={{ top: 20, bottom: 20 }}
         onPress={() => setCurrentBTCPrice(randomIntFromInterval(10000, 30000))}
       >
-        <TextMedium style={{ marginTop: 20 }}>
+        <TextMedium
+          adjustsFontSizeToFit={true}
+          numberOfLines={1}
+          color={colors.lightGrey}
+          size={15}
+          style={{ marginTop: 20 }}
+        >
           DEMO: Shuffle Current BTC Price | {toCurrency(currentBTCPrice)}
         </TextMedium>
+        <TextMedium
+          adjustsFontSizeToFit={true}
+          numberOfLines={1}
+          color={colors.lightGrey}
+          size={15}
+          style={{ marginTop: 10 }}
+        >
+          Actual BTC Price | {toCurrency(staticCurrentBTCPrice)}
+        </TextMedium>
       </Pressable>
-      <TextMedium style={{ marginTop: 10 }}>
-        Actual BTC Price | {toCurrency(staticCurrentBTCPrice)}
-      </TextMedium>
       {/* <View style={{ height: 130 }}>
         <ScrollView horizontal>
           {TAGGED.map((item, index) => (
