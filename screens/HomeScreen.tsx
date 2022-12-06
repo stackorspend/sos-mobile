@@ -70,10 +70,7 @@ const HomeScreen = () => {
   } | null>({ satsBalance: 0, fiatBalance: 0 })
   const [transactions, setTransactions] = useState<ApiTxn[]>([])
   const [assetDisplay, setAssetDisplay] = useState<"sats" | "fiat" | "btc">("sats")
-  const [galoyToken, setGaloyToken] = useState<string | null>(
-    "",
-    // "nWL9JckgHA6uMjwuz6kkYrAowrpNXSas",
-  )
+  const [galoyToken, setGaloyToken] = useState<string | null>("")
   const [staticCurrentBTCPrice, setStaticCurrentBTCPrice] = useState<number | null>(0)
   const [galoyTokenFromInput, setGaloyTokenFromInput] = useState<string | null>(null)
   const [initializing, setInitializing] = useState(true)
