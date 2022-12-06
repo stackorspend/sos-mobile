@@ -119,21 +119,12 @@ export default function TransactionsScreen() {
               {toFormattedNumber(Math.abs(selectedTransaction?.sats.fee))}
             </TextRegular>
             <DetailHeading>Invoice</DetailHeading>
-            {/* <TextRegular mBottom={25}>Saturday, November 12, 2022 12:53 AM</TextRegular> */}
+            <TextRegular mBottom={25}>{selectedTransaction?.txHash}</TextRegular>
           </View>
         </BottomSheet>
       </View>
     </SafeAreaView>
   )
-}
-
-type TransactionProps = {
-  id: number
-  date: string
-  name: string
-  type: "send" | "receive"
-  sats: number
-  transactionType: "lightning" | "bitcoin"
 }
 
 const TransactionItem = ({ item }: { item: ApiTxn }) => (
@@ -144,7 +135,8 @@ const TransactionItem = ({ item }: { item: ApiTxn }) => (
       justifyContent: "space-between",
       borderRadius: 4,
       marginBottom: 30,
-      padding: 20,
+      padding: 12,
+      paddingVertical: 20,
       shadowOffset: {
         width: 4,
         height: 3,
@@ -154,14 +146,21 @@ const TransactionItem = ({ item }: { item: ApiTxn }) => (
       backgroundColor: "white",
     }}
   >
-    <View>
+    <View style={{ flex: 0.5, width: 20 }}>
       {item.sats.amountWithFee < 0 ? (
-        <Feather name="arrow-up-right" size={24} color="grey" />
+        <Feather name="arrow-up-right" size={20} color="grey" />
       ) : (
-        <Feather name="arrow-down-left" size={24} color="grey" />
+        <Feather name="arrow-down-left" size={20} color="grey" />
       )}
     </View>
-    <View style={{ flexDirection: "row", alignItems: "center" }}>
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        flex: 2,
+      }}
+    >
       {item.txType === "BITCOIN" ? (
         <FontAwesome5
           style={{ marginRight: 8 }}
@@ -178,7 +177,7 @@ const TransactionItem = ({ item }: { item: ApiTxn }) => (
         />
       )}
       <View>
-        <TextRegular size={14} color="#939393">
+        <TextRegular size={11} color="#939393" numberOfLines={1}>
           {new Date(item.timestamp).toLocaleString("en-GB", {
             day: "numeric",
             month: "short",
@@ -190,8 +189,15 @@ const TransactionItem = ({ item }: { item: ApiTxn }) => (
         <TextRegular size={16}>{item.source}</TextRegular>
       </View>
     </View>
-    <View>
-      <TextSemibold>{Math.abs(item.sats.amountWithFee)} sats 💸</TextSemibold>
+    <View style={{ flex: 2 }}>
+      <TextSemibold
+        style={{ textAlign: "right" }}
+        adjustsFontSizeToFit={true}
+        numberOfLines={1}
+        size={14}
+      >
+        {toFormattedNumber(Math.abs(item.sats.amountWithFee))} sats 💸
+      </TextSemibold>
     </View>
   </View>
 )

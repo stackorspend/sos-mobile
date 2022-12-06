@@ -48,7 +48,7 @@ const GALOY_ENDPOINTS = {
 // - tappable toggle for price ✅
 // - transactions list clean up ✅
 // - toggle for bitcoin's current price ✅
-// - add a way to accept a unique token, store this in localstorage
+// - add a way to accept a unique token, store this in localstorage ✅
 // - add splash screen and logo ✅
 // - pass around correct stack/spend state ✅
 // - add reset button to blow up DB and start fresh ✅
@@ -70,7 +70,10 @@ const HomeScreen = () => {
   } | null>({ satsBalance: 0, fiatBalance: 0 })
   const [transactions, setTransactions] = useState<ApiTxn[]>([])
   const [assetDisplay, setAssetDisplay] = useState<"sats" | "fiat" | "btc">("sats")
-  const [galoyToken, setGaloyToken] = useState<string | null>("")
+  const [galoyToken, setGaloyToken] = useState<string | null>(
+    "",
+    // "nWL9JckgHA6uMjwuz6kkYrAowrpNXSas",
+  )
   const [staticCurrentBTCPrice, setStaticCurrentBTCPrice] = useState<number | null>(0)
   const [galoyTokenFromInput, setGaloyTokenFromInput] = useState<string | null>(null)
   const [initializing, setInitializing] = useState(true)
@@ -179,6 +182,7 @@ const HomeScreen = () => {
         opacity={0.8}
         disappearsOnIndex={-1}
         appearsOnIndex={0}
+        onPress={() => bottomSheetRef.current?.close()}
       />
     ),
     [],
@@ -450,7 +454,8 @@ const HomeScreen = () => {
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
-        enablePanDownToClose
+        enablePanDownToClose={true}
+        keyboardBehavior="interactive"
         snapPoints={snapPoints}
         backdropComponent={renderBackdrop}
       >
